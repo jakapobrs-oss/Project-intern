@@ -1,0 +1,135 @@
+# Digital Signage Management System — dev stack
+# รันด้วย: docker compose up -d
+# กฎข้อ 1: ทุกตัวต้องใช้งานได้ฟรี + เสถียร
+version: "3.9"
+
+services:
+  # ฐานข้อมูลหลัก — PostgreSQL 16
+  postgres:
+    image: postgres:16-alpine
+    container_name: signage_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-signage}
+      POSTGRES_USER: ${POSTGRES_USER:-signage}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-signage_dev}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-signage}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Cache + queue broker — Redis 7
+  redis:
+    image: redis:7-alpine
+    container_name: signage_redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # MinIO — S3-compatible storage สำหรับ media files (ฟรี + self-host)
+  minio:
+    image: minio/minio:latest
+    container_name: signage_minio
+    restart: unless-stopped
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-minioadmin}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-minioadmin}
+    ports:
+      - "9000:9000"   # S3 API
+      - "9001:9001"   # Web console
+    volumes:
+      - minio_data:/data
+    healthcheck:
+      test: ["CMD", "mc", "ready", "local"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Backend API — FastAPI (uvicorn)
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: signage_backend
+    restart: unless-stopped
+    env_file:
+      - .env
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend:/app
+    # auto-migrate + auto-seed admin + start uvicorn
+    # ใช้ entrypoint inline ให้ user รัน `docker compose up` แล้วใช้งานได้เลย
+    command: >
+      sh -c "
+      alembic upgrade head &&
+      python -m app.scripts.seed &&
+      uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+      "
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8000/healthz', timeout=3)\""]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+  # Worker — Arq (background tasks: transcode, push manifest, heartbeat aggregation)
+  worker:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: signage_worker
+    restart: unless-stopped
+    env_file:
+      - .env
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - ./backend:/app
+    command: arq app.worker.WorkerSettings
+
+  # Admin UI — Next.js 14
+  admin-ui:
+    build:
+      context: ./admin-ui
+      dockerfile: Dockerfile
+    container_name: signage_admin_ui
+    restart: unless-stopped
+    env_file:
+      - .env
+    depends_on:
+      backend:
+        condition: service_healthy
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./admin-ui:/app
+      - /app/node_modules
+      - /app/.next
+    command: npm run dev
+
+volumes:
+  postgres_data:
+  redis_data:
+  minio_data:

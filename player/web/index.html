@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Signage Player</title>
+    <link rel="manifest" href="manifest.json">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<!-- Pair screen — แสดงเฉพาะตอนยังไม่มี device_token -->
+<div id="pair-screen">
+    <div class="card">
+        <h1>📺 Signage Player</h1>
+        <p style="opacity:.7;font-size:14px;margin-bottom:8px">ใส่ URL backend + pairing code 6 ตัว</p>
+        <input id="server-url" placeholder="http://192.168.1.10:8000" />
+        <input id="pair-code" placeholder="PAIRING CODE" style="font-size: 24px; letter-spacing: 4px; text-align: center;" />
+        <button id="btn-pair">Pair</button>
+        <div class="status" id="pair-status"></div>
+    </div>
+</div>
+
+<!-- Player screen — zone-based stage -->
+<div id="player-screen">
+    <div id="stage">
+        <!-- zones จะถูก inject โดย renderer ตาม layout_json -->
+    </div>
+</div>
+
+<!-- Emergency override — high z-index ทับทุกอย่าง -->
+<div id="emergency-overlay" role="alert" aria-live="assertive">
+    <h1 id="emergency-title">⚠ แจ้งเตือนฉุกเฉิน</h1>
+    <div class="msg" id="emergency-msg"></div>
+</div>
+
+<!-- Info bar (debug) -->
+<div id="info-bar"></div>
+
+<!-- Crash screen (auto-reload countdown) -->
+<div id="crash-screen">
+    <h2>⚠ Player crashed</h2>
+    <pre id="crash-detail"></pre>
+    <p id="crash-countdown">กำลัง reload ใน 10 วินาที...</p>
+</div>
+
+<script src="app.js"></script>
+<script>
+    // ลงทะเบียน service worker (offline + LRU cache)
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('sw.js').catch(console.error);
+    }
+</script>
+</body>
+</html>

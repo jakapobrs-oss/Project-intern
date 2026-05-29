@@ -1,0 +1,46 @@
+# ============================================================================
+# systemd unit สำหรับ deploy บน Ubuntu/Debian server
+#
+# ติดตั้ง:
+#   sudo cp deploy/systemd/signage.service /etc/systemd/system/
+#   sudo systemctl daemon-reload
+#   sudo systemctl enable --now signage
+#
+# ดู status:
+#   systemctl status signage
+#   journalctl -u signage -f
+#
+# Restart:
+#   sudo systemctl restart signage
+# ============================================================================
+[Unit]
+Description=Digital Signage Management Stack
+Documentation=https://github.com/yourorg/signage
+Requires=docker.service
+After=docker.service network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+
+# เปลี่ยน path ตามที่ user clone repo
+WorkingDirectory=/opt/signage
+
+# ใช้ profile prod (Dockerfile.prod + nginx + restart=always)
+ExecStart=/usr/bin/docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d
+ExecStop=/usr/bin/docker compose -f docker-compose.yml -f docker-compose.prod.yml down
+
+# reload เมื่อแก้ไฟล์ compose
+ExecReload=/usr/bin/docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d
+
+TimeoutStartSec=300       # build ครั้งแรกอาจช้า
+TimeoutStopSec=60
+
+# Restart policy — docker container มี restart=always ของตัวเองแล้ว
+# แต่ถ้า host reboot, systemd จะ start unit เอง
+Restart=on-failure
+RestartSec=30s
+
+[Install]
+WantedBy=multi-user.target

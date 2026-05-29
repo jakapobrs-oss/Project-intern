@@ -1,0 +1,13 @@
+[Unit]
+Description=Signage daily backup (pg_dump + restic)
+Requires=signage.service
+After=signage.service
+
+[Service]
+Type=oneshot
+WorkingDirectory=/opt/signage
+EnvironmentFile=/opt/signage/.env
+ExecStart=/opt/signage/scripts/backup.sh
+User=signage
+StandardOutput=journal
+StandardError=journal

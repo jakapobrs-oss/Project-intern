@@ -1,0 +1,99 @@
+# ============================================================================
+# docker-compose.prod.yml — Production override
+#
+# ใช้คู่กับ docker-compose.yml:
+#   docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d
+#
+# ต่างจาก dev:
+#   - backend/admin-ui ใช้ Dockerfile.prod (multi-stage, non-root)
+#   - ไม่ mount source code (build ลง image ทั้งหมด)
+#   - ไม่เปิด port DB/Redis/MinIO ออกข้างนอก (เฉพาะภายใน docker network)
+#   - APP_ENV=production (HSTS เปิด, log level เพิ่ม)
+#   - restart=always (ไม่ใช่ unless-stopped)
+#   - nginx reverse proxy + TLS termination (ดู nginx/signage.conf)
+# ============================================================================
+services:
+  postgres:
+    restart: always
+    # ไม่ expose port ออกข้างนอก — สื่อสารผ่าน docker network เท่านั้น
+    ports: !reset []
+
+  redis:
+    restart: always
+    ports: !reset []
+
+  minio:
+    restart: always
+    ports: !reset []
+    # console 9001 ยังเปิดให้ admin SSH-tunnel เข้ามาดูได้
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.prod
+    restart: always
+    environment:
+      APP_ENV: production
+      APP_DEBUG: "false"
+      LOG_LEVEL: WARNING
+      UVICORN_WORKERS: "4"
+    volumes: !reset []     # ไม่ mount source — ใช้ image เท่านั้น
+    # ไม่ expose 8000 ออก host — เข้าผ่าน nginx เท่านั้น
+    expose:
+      - "8000"
+    ports: !reset []
+    command: >
+      sh -c "
+      alembic upgrade head &&
+      uvicorn app.main:app --host 0.0.0.0 --port 8000
+        --workers $${UVICORN_WORKERS:-4}
+        --proxy-headers --forwarded-allow-ips='*'
+      "
+
+  worker:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.prod
+    restart: always
+    environment:
+      APP_ENV: production
+      LOG_LEVEL: WARNING
+    volumes: !reset []
+    command: arq app.worker.WorkerSettings
+
+  admin-ui:
+    build:
+      context: ./admin-ui
+      dockerfile: Dockerfile.prod
+    restart: always
+    volumes: !reset []
+    expose:
+      - "3000"
+    ports: !reset []
+
+  # ───── nginx reverse proxy + TLS ─────
+  # mount cert ผ่าน volume: /etc/letsencrypt → /etc/letsencrypt
+  nginx:
+    image: nginx:1.27-alpine
+    container_name: signage_nginx
+    restart: always
+    depends_on:
+      backend:
+        condition: service_healthy
+      admin-ui:
+        condition: service_healthy
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/signage.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./nginx/letsencrypt:/etc/letsencrypt:ro
+      - nginx_cache:/var/cache/nginx
+    healthcheck:
+      test: ["CMD", "nginx", "-t"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+volumes:
+  nginx_cache:

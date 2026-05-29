@@ -1,0 +1,37 @@
+# systemd unit สำหรับ CEC helper service บน Linux player (RPi)
+#
+# ติดตั้ง:
+#   sudo cp tv-control/cec-helper.service /etc/systemd/system/
+#   sudo systemctl daemon-reload
+#   sudo systemctl enable --now cec-helper
+#
+# ตรวจสอบ:
+#   curl http://127.0.0.1:7600/health
+#   curl -X POST http://127.0.0.1:7600/cec/power -d '{"on": true}'
+#
+# logs:
+#   journalctl -u cec-helper -f
+
+[Unit]
+Description=HDMI-CEC Helper for Signage Player
+Documentation=https://github.com/yourorg/signage/blob/main/tv-control/README.md
+After=network.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/python3 /opt/signage/tv-control/cec_helper.py serve --port 7600 --bind 127.0.0.1
+Restart=on-failure
+RestartSec=10s
+User=pi
+
+# CEC needs access to /dev/cec0 (video group มี permission)
+SupplementaryGroups=video
+
+# Hardening
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target

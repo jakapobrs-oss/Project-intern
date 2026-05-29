@@ -1,0 +1,53 @@
+# ============================================================================
+# Admin UI production image — multi-stage build
+# ใช้ Next.js standalone output (cut bundle size 80%)
+#
+# Build: docker build -f Dockerfile.prod -t signage-admin-ui:prod ./admin-ui
+# ============================================================================
+
+# ---------- Stage 1: deps — install ทุก dep (รวม dev) สำหรับ build ----------
+FROM node:20-alpine AS deps
+WORKDIR /app
+COPY package.json package-lock.json* ./
+RUN npm ci --no-audit --no-fund
+
+
+# ---------- Stage 2: builder — build Next.js ----------
+FROM node:20-alpine AS builder
+WORKDIR /app
+COPY --from=deps /app/node_modules ./node_modules
+COPY . .
+
+# ต้อง enable standalone output ใน next.config (auto handled ที่นี่)
+# ENV NEXT_TELEMETRY_DISABLED=1 — ไม่ส่ง analytics ไป Vercel
+ENV NEXT_TELEMETRY_DISABLED=1
+ENV NODE_ENV=production
+RUN npm run build
+
+
+# ---------- Stage 3: runner — minimal runtime ----------
+FROM node:20-alpine AS runner
+WORKDIR /app
+
+ENV NODE_ENV=production
+ENV NEXT_TELEMETRY_DISABLED=1
+ENV PORT=3000
+
+# non-root user (เลข 1001 หลีก collision กับ node user เดิม)
+RUN addgroup -g 1001 -S nodejs && \
+    adduser -S nextjs -u 1001 -G nodejs
+
+# copy standalone build (Next 14 standalone output)
+COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
+COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
+COPY --from=builder --chown=nextjs:nodejs /app/public ./public
+
+USER nextjs
+
+EXPOSE 3000
+
+# server.js สร้างโดย Next.js standalone build
+CMD ["node", "server.js"]
+
+HEALTHCHECK --interval=15s --timeout=5s --start-period=20s --retries=3 \
+    CMD wget --quiet --tries=1 --spider http://localhost:3000/ || exit 1

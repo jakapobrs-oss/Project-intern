@@ -1,0 +1,37 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ===== Theme variables (light + dark) — Phase 7 ===== */
+:root {
+  --bg: #f8fafc;          /* slate-50 */
+  --surface: #ffffff;
+  --border: #e2e8f0;      /* slate-200 */
+  --text: #0f172a;        /* slate-900 */
+  --text-muted: #64748b;  /* slate-500 */
+}
+
+html.dark {
+  --bg: #0f172a;          /* slate-900 */
+  --surface: #1e293b;     /* slate-800 */
+  --border: #334155;      /* slate-700 */
+  --text: #f1f5f9;        /* slate-100 */
+  --text-muted: #94a3b8;  /* slate-400 */
+  color-scheme: dark;
+}
+
+html, body {
+  background: var(--bg);
+  color: var(--text);
+}
+
+/* utility — สำหรับ status badge */
+.status-online   { @apply bg-emerald-100 text-emerald-700; }
+.status-offline  { @apply bg-slate-200 text-slate-600; }
+.status-error    { @apply bg-rose-100 text-rose-700; }
+.status-unpaired { @apply bg-amber-100 text-amber-700; }
+
+/* scrollbar */
+* { scrollbar-width: thin; scrollbar-color: #cbd5e1 transparent; }
+*::-webkit-scrollbar { width: 8px; height: 8px; }
+*::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }

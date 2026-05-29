@@ -1,0 +1,24 @@
+# systemd timer — รัน backup ทุกวัน 02:00 น.
+#
+# ติดตั้ง:
+#   sudo cp deploy/systemd/signage-backup.{service,timer} /etc/systemd/system/
+#   sudo systemctl daemon-reload
+#   sudo systemctl enable --now signage-backup.timer
+#
+# ดู timer:
+#   systemctl list-timers --all
+#
+# Run manual:
+#   sudo systemctl start signage-backup.service
+
+[Unit]
+Description=Signage daily backup timer
+Requires=signage-backup.service
+
+[Timer]
+OnCalendar=*-*-* 02:00:00
+Persistent=true                # ถ้า host down ตอน 02:00 → รัน ASAP หลัง boot
+RandomizedDelaySec=5m          # spread load บน backup target
+
+[Install]
+WantedBy=timers.target

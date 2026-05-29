@@ -1,0 +1,53 @@
+# ============================================================================
+# Backend production image — multi-stage build
+# ใช้คู่กับ docker-compose.prod.yml (override จาก docker-compose.yml dev)
+#
+# Build: docker build -f Dockerfile.prod -t signage-backend:prod ./backend
+# ============================================================================
+
+# ---------- Stage 1: Builder — compile wheels + install deps ----------
+FROM python:3.12-slim AS builder
+
+# system deps สำหรับ build wheels (asyncpg, bcrypt, pillow)
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    libpq-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /build
+COPY requirements.txt .
+
+# ติด deps ลง /install (จะ copy ไป stage runtime)
+RUN pip install --no-cache-dir --upgrade pip && \
+    pip install --no-cache-dir --prefix=/install -r requirements.txt
+
+
+# ---------- Stage 2: Runtime — minimal image ----------
+FROM python:3.12-slim AS runtime
+
+# runtime deps เท่านั้น (ไม่มี build-essential)
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    libpq5 \
+    ffmpeg \
+    curl \
+    && rm -rf /var/lib/apt/lists/* \
+    && groupadd -r signage --gid 1000 \
+    && useradd -r -g signage --uid 1000 --create-home --home-dir /home/signage signage
+
+# copy compiled deps จาก builder
+COPY --from=builder /install /usr/local
+
+WORKDIR /app
+# copy source — เป็น root chown เป็น signage
+COPY --chown=signage:signage . .
+
+USER signage
+
+EXPOSE 8000
+
+# default: serve via uvicorn (worker override ผ่าน docker-compose)
+# --workers 2 เริ่มต้น — ปรับตาม CPU cores ผ่าน UVICORN_WORKERS env
+CMD ["sh", "-c", "uvicorn app.main:app --host 0.0.0.0 --port 8000 --workers ${UVICORN_WORKERS:-2} --proxy-headers --forwarded-allow-ips='*'"]
+
+HEALTHCHECK --interval=15s --timeout=5s --start-period=30s --retries=5 \
+    CMD curl -fsS http://localhost:8000/healthz || exit 1

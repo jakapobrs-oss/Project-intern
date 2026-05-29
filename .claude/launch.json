@@ -1,0 +1,45 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "admin-ui",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["--prefix", "admin-ui", "run", "dev"],
+      "port": 3000
+    },
+    {
+      "name": "player-web",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["serve", "player/web", "-p", "8080", "-s"],
+      "port": 8080
+    },
+    {
+      "name": "backend-venv",
+      "runtimeExecutable": "backend/.venv/Scripts/uvicorn.exe",
+      "runtimeArgs": [
+        "app.main:app",
+        "--app-dir",
+        "backend",
+        "--host",
+        "0.0.0.0",
+        "--port",
+        "8001",
+        "--reload"
+      ],
+      "port": 8001
+    },
+    {
+      "name": "backend-docker",
+      "runtimeExecutable": "docker",
+      "runtimeArgs": [
+        "compose",
+        "-f",
+        "docker-compose.yml",
+        "up",
+        "--build",
+        "backend"
+      ],
+      "port": 8000
+    }
+  ]
+}
