@@ -1,0 +1,198 @@
+erDiagram
+    %% ===== Identity =====
+    users {
+        uuid id PK
+        string username UK
+        string email UK
+        string password_hash
+        string full_name
+        enum role "super_admin/admin/editor/approver/viewer/operator/device"
+        bool is_active
+        bool is_locked
+        int failed_login_count
+        datetime created_at
+        datetime updated_at
+        datetime last_login_at
+    }
+
+    %% ===== Devices =====
+    devices {
+        uuid id PK
+        string name
+        string location
+        string pairing_code UK
+        datetime pairing_code_expires_at
+        datetime paired_at
+        string device_token_hash
+        enum platform "android_tv/android_tablet/rpi_kiosk/windows_pc/web_browser"
+        string mac_address
+        string ip_address
+        string serial_number
+        string tv_brand "samsung/lg/sony/..."
+        string tv_model
+        enum status "unpaired/online/offline/error"
+        string app_version
+        datetime last_heartbeat_at
+        string last_manifest_version
+        float cpu_percent
+        float temperature_c
+        int uptime_sec
+        bool is_active
+        datetime created_at
+        datetime updated_at
+    }
+
+    player_groups {
+        uuid id PK
+        string name UK
+        string description
+        datetime created_at
+        datetime updated_at
+    }
+
+    player_group_members {
+        uuid player_group_id PK,FK
+        uuid device_id PK,FK
+    }
+
+    %% ===== Content =====
+    contents {
+        uuid id PK
+        string name
+        string description
+        enum type "image/video/web/stream/text"
+        string storage_key "S3/MinIO path"
+        string mime_type
+        bigint file_size
+        string sha256 "dedupe"
+        int width
+        int height
+        float duration_sec
+        string thumbnail_key
+        string url "web/stream"
+        enum approval_status "draft/pending/approved/rejected"
+        uuid approved_by FK
+        datetime approved_at
+        string rejection_reason
+        datetime expires_at
+        uuid created_by FK
+        bool is_active
+        datetime created_at
+        datetime updated_at
+    }
+
+    presentations {
+        uuid id PK
+        string name
+        string description
+        json layout_json "template + zones"
+        int duration_sec
+        uuid created_by FK
+        datetime created_at
+        datetime updated_at
+    }
+
+    presentation_zones {
+        uuid id PK
+        uuid presentation_id FK
+        string zone_key "match layout_json"
+        uuid content_id FK
+        json params_json "volume/fit_mode/..."
+        int order_index
+    }
+
+    %% ===== Playlists / Schedules =====
+    plans {
+        uuid id PK
+        string name UK
+        string description
+        uuid created_by FK
+        datetime created_at
+        datetime updated_at
+    }
+
+    plan_items {
+        uuid id PK
+        uuid plan_id FK
+        uuid presentation_id FK
+        int order_index
+        int duration_sec_override
+    }
+
+    schedules {
+        uuid id PK
+        string name
+        string description
+        uuid plan_id FK
+        uuid player_group_id FK
+        datetime start_at
+        datetime end_at
+        string repeat_rule "iCal RRULE"
+        string daily_window_start "HH:MM"
+        string daily_window_end "HH:MM"
+        int priority "100 default"
+        enum status "draft/pending_approval/active/paused/expired"
+        uuid created_by FK
+        uuid approved_by FK
+        datetime approved_at
+        bool is_active
+        datetime created_at
+        datetime updated_at
+    }
+
+    %% ===== Emergency (target ใช้ JSON ไม่ใช่ FK) =====
+    emergency_broadcasts {
+        uuid id PK
+        string title
+        enum kind "text/image/url"
+        json payload
+        json target "all/device_ids/group_ids"
+        enum status "draft/active/expired/cancelled"
+        int priority "1000 default"
+        datetime starts_at
+        datetime ends_at
+        bool requires_ack
+        datetime acknowledged_at
+        uuid created_by "no FK - keep on user delete"
+        string notes
+        datetime created_at
+        datetime updated_at
+    }
+
+    %% ===== Audit (append-only, no FK ตั้งใจ) =====
+    audit_logs {
+        uuid id PK
+        string actor_type "user/device/system/anonymous"
+        string actor_id "no FK - keep history"
+        string actor_label "snapshot username"
+        string action "auth.login/content.approve/..."
+        string target_type
+        string target_id
+        enum outcome "success/fail/denied"
+        string ip_address
+        string user_agent
+        string message
+        json extra
+        datetime created_at
+    }
+
+    %% ===== Relationships =====
+    users ||--o{ contents          : "created_by"
+    users ||--o{ contents          : "approved_by"
+    users ||--o{ presentations     : "created_by"
+    users ||--o{ plans             : "created_by"
+    users ||--o{ schedules         : "created_by"
+    users ||--o{ schedules         : "approved_by"
+
+    devices }o--o{ player_groups   : "member of (M:N)"
+    player_groups ||--o{ player_group_members : ""
+    devices       ||--o{ player_group_members : ""
+
+    presentations      ||--o{ presentation_zones : "has zones"
+    contents           ||--o{ presentation_zones : "shown in"
+
+    plans              ||--o{ plan_items         : "ordered items"
+    presentations      ||--o{ plan_items         : "referenced by"
+
+    plans              ||--o{ schedules          : "scheduled as"
+    player_groups      ||--o{ schedules          : "target"
