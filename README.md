@@ -2,8 +2,8 @@
 
 ระบบจัดการจอประชาสัมพันธ์ — ครอบคลุม LAN, HDMI-CEC, RS-232 control + Content/Schedule/Playlist management
 
-> **สถานะ (2026-05-28):** Phase 0–6 + Player polish (F) ✅ — backend + admin UI + Web/Android player พร้อมใช้
-> 🗂️ [docs/er-diagram.md](docs/er-diagram.md) — Mermaid ER diagram · [docs/](docs/) — architecture / api / deployment
+> **สถานะ (2026-06-05):** Phase 0–7 + gap-closing ✅ — scheduler eval (RRULE/day-part), worker pipeline (thumbnail/transcode), reporting+export, SSRF/ClamAV, LED board พร้อม · **pytest 142 passed**
+> 🗂️ [docs/er-diagram.md](docs/er-diagram.md) — ER diagram · [docs/](docs/) — architecture / api / deployment / **DR / troubleshooting / player-config / คู่มือ admin+ติดตั้ง (ไทย)** · [SECURITY.md](SECURITY.md)
 
 ---
 
@@ -122,10 +122,14 @@ Project-intern/
 | 5 — Emergency + Monitoring | ✅ | Override + auto-expire + Prometheus + audit + Sentry + backup |
 | 6 — Admin UI | ✅ | 11 pages (Next.js + Tailwind) + auth flow + drag-drop + composer |
 | F — Player polish | ✅ | Zone renderer + plan carousel + emergency overlay + backoff + LRU |
+| 7 — Deploy hardening | ✅ | Sec headers + prod Dockerfiles + nginx TLS + systemd + CI + CSRF + httpOnly cookie |
+| G — Gap-closing (#29) | ✅ | Scheduler RRULE/day-part eval + worker thumbnail/transcode+enqueue + reporting §28 (Excel/PDF) + SSRF/ClamAV + LED board + 6 docs |
 
-## ⏭️ Next: Option E run / Phase 7 deploy hardening
-- รันใน environment user: `bash scripts/run-e2e.sh`
-- Phase 7: HDMI-CEC native, httpOnly cookie, i18n, CI/CD, hardening
+## ⏭️ Next: รันจริง (unit ผ่าน 142/142 แล้ว)
+- `cd backend && pip install -r requirements.txt && pytest -v`  → **142 passed**
+- `docker compose up -d` + `python scripts/smoke_e2e.py`  (integration จริง — ยังไม่เคยรันกับ infra)
+- Hardware: build APK / RS-232+CEC บน TV จริง / LED controller จริง
+- go-live: rotate secrets + HTTPS + ClamAV + backup timer → [SECURITY.md](SECURITY.md), [docs/installation-guide-th.md](docs/installation-guide-th.md)
 
 ---
 
