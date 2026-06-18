@@ -2,18 +2,16 @@
 pytest fixtures — DB ทดสอบใช้ SQLite in-memory (async)
 override get_db ของ app เพื่อไม่ต้องพึ่ง postgres ตอน unit test
 """
-import asyncio
-import uuid
-import pytest
+
 import pytest_asyncio
-from httpx import AsyncClient, ASGITransport
+from httpx import ASGITransport, AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 from sqlalchemy.pool import StaticPool
 
+from app.core.security import hash_password
 from app.db import Base, get_db
 from app.main import app
-from app.core.security import hash_password
-from app.models.user import User, Role
+from app.models.user import Role, User
 
 
 @pytest_asyncio.fixture
@@ -35,7 +33,7 @@ async def db_engine():
 @pytest_asyncio.fixture
 async def db_session(db_engine) -> AsyncSession:
     """Session factory ต่อ test"""
-    SessionLocal = async_sessionmaker(db_engine, expire_on_commit=False)
+    SessionLocal = async_sessionmaker(db_engine, expire_on_commit=False)  # noqa: N806 — SQLAlchemy sessionmaker ใช้ PascalCase ตาม convention
     async with SessionLocal() as session:
         yield session
 

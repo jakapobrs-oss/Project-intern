@@ -3,13 +3,12 @@ Device service — pairing + heartbeat
 """
 import hashlib
 import secrets
-import uuid
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
+
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.device import Device, DeviceStatus
-
 
 PAIRING_CODE_TTL_MINUTES = 15
 HEARTBEAT_OFFLINE_THRESHOLD_SEC = 300  # 5 นาทีไม่มี heartbeat = offline
@@ -27,7 +26,7 @@ class DeviceServiceError(Exception):
 def issue_pairing_code(device: Device) -> str:
     """ออก pairing code ใหม่ + กำหนด expire"""
     device.pairing_code = Device.generate_pairing_code()
-    device.pairing_code_expires_at = datetime.now(timezone.utc) + timedelta(minutes=PAIRING_CODE_TTL_MINUTES)
+    device.pairing_code_expires_at = datetime.now(UTC) + timedelta(minutes=PAIRING_CODE_TTL_MINUTES)
     return device.pairing_code
 
 
@@ -49,7 +48,7 @@ async def claim_pairing(
     if device is None:
         raise DeviceServiceError("INVALID_CODE", "pairing code ไม่ถูกต้อง")
 
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
     if device.pairing_code_expires_at and device.pairing_code_expires_at < now:
         raise DeviceServiceError("CODE_EXPIRED", "pairing code หมดอายุแล้ว")
 
@@ -103,7 +102,7 @@ async def apply_heartbeat(
 ) -> Device:
     """อัปเดต heartbeat จาก player"""
     device.status = status
-    device.last_heartbeat_at = datetime.now(timezone.utc)
+    device.last_heartbeat_at = datetime.now(UTC)
     if app_version is not None:
         device.app_version = app_version
     if ip_address is not None:

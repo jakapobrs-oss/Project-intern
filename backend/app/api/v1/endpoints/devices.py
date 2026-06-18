@@ -3,20 +3,24 @@ Device + PlayerGroup endpoints
 ดู §13 ใน PLAN.md
 """
 import uuid
-from fastapi import APIRouter, Depends, HTTPException, status
+
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.api.v1.deps import get_current_user, require_role
+from app.api.v1.deps import require_role
 from app.db import get_db
-from app.models.device import Device, PlayerGroup, DeviceStatus
-from app.models.user import User, Role
+from app.models.device import Device, DeviceStatus, PlayerGroup
+from app.models.user import Role, User
 from app.schemas.device import (
-    DeviceCreate, DeviceUpdate, DeviceOut,
-    PlayerGroupCreate, PlayerGroupUpdate, PlayerGroupOut,
+    DeviceCreate,
+    DeviceOut,
+    DeviceUpdate,
+    PlayerGroupCreate,
+    PlayerGroupOut,
+    PlayerGroupUpdate,
 )
 from app.services import device_service
-
 
 router = APIRouter()
 

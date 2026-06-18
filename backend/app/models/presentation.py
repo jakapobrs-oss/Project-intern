@@ -6,7 +6,8 @@ Presentation model — layout/template + content ที่ใส่ในแต�
 """
 import uuid
 from datetime import datetime
-from sqlalchemy import String, DateTime, Integer, Text, ForeignKey, JSON, Uuid, func
+
+from sqlalchemy import JSON, DateTime, ForeignKey, Integer, String, Text, Uuid, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db import Base

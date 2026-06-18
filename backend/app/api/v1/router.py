@@ -3,7 +3,7 @@ API v1 main router
 """
 from fastapi import APIRouter
 
-from app.api.v1.endpoints import auth, users, devices, contents, presentations
+from app.api.v1.endpoints import auth, contents, devices, presentations, users
 
 api_router = APIRouter()
 
@@ -24,7 +24,7 @@ api_router.include_router(contents.router, prefix="/contents", tags=["contents"]
 api_router.include_router(presentations.router, prefix="/presentations", tags=["presentations"])
 
 # Phase 3+ (added next)
-from app.api.v1.endpoints import plans, schedules, player, tv_control  # noqa: E402
+from app.api.v1.endpoints import plans, player, schedules, tv_control  # noqa: E402
 
 api_router.include_router(plans.router, prefix="/plans", tags=["plans"])
 api_router.include_router(schedules.router, prefix="/schedules", tags=["schedules"])

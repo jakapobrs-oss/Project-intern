@@ -2,15 +2,14 @@
 Security primitives: bcrypt password hashing + JWT encode/decode
 ใช้ python-jose + passlib (สอดคล้อง §26)
 """
-from datetime import datetime, timedelta, timezone
-from typing import Any
 import uuid
+from datetime import UTC, datetime, timedelta
+from typing import Any
 
-from jose import jwt, JWTError
+from jose import JWTError, jwt
 from passlib.context import CryptContext
 
 from app.config import settings
-
 
 # bcrypt rounds=12 — default ของ passlib (~250ms per hash บน server ปกติ)
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
@@ -42,7 +41,7 @@ def _create_token(
     extra_claims: dict[str, Any] | None = None,
 ) -> str:
     """สร้าง JWT ทั่วไป — ใช้ภายในไฟล์นี้เท่านั้น"""
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
     payload: dict[str, Any] = {
         "sub": str(subject),
         "type": token_type,

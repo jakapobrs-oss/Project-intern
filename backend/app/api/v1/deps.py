@@ -8,16 +8,16 @@ Auth modes (Phase 7 — dual support):
 ทั้ง 2 อ่านได้ทั้งคู่ — รูปแบบไหนมาก่อนใช้ตัวนั้น
 """
 import uuid
-from typing import Iterable
+from collections.abc import Iterable
+
 from fastapi import Cookie, Depends, HTTPException, Request, status
 from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.core.security import decode_token, TokenType
+from app.core.security import TokenType, decode_token
 from app.db import get_db
-from app.models.user import User, Role
-
+from app.models.user import Role, User
 
 # OAuth2 scheme — เผยใน /api/docs ให้กด Authorize ทดสอบ login ได้
 # auto_error=False เพราะเราจะ fallback ไปอ่าน cookie ถ้า header ไม่มา
@@ -62,7 +62,7 @@ async def get_current_user(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="token ไม่ถูกต้องหรือหมดอายุ",
             headers={"WWW-Authenticate": "Bearer"},
-        )
+        ) from None
 
     if payload.get("type") != TokenType.ACCESS:
         raise HTTPException(

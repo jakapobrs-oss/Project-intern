@@ -4,17 +4,17 @@ Phase 5 §monitoring + §audit
 """
 from datetime import datetime
 from uuid import UUID
+
 from fastapi import APIRouter, Depends, Query, Response
+from pydantic import BaseModel, ConfigDict
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
-from pydantic import BaseModel, ConfigDict
 
 from app.api.v1.deps import require_role
 from app.core.metrics import build_metrics
 from app.db import get_db
 from app.models.audit import AuditLog, AuditOutcome
 from app.models.user import Role
-
 
 router = APIRouter()
 
@@ -43,6 +43,9 @@ class AuditLogOut(BaseModel):
     created_at: datetime
 
 
+_audit_admin = require_role(Role.SUPER_ADMIN, Role.ADMIN)
+
+
 @router.get("/audit/logs", response_model=list[AuditLogOut])
 async def list_audit_logs(
     action: str | None = Query(None, description="filter exact action verb"),
@@ -51,7 +54,7 @@ async def list_audit_logs(
     outcome: AuditOutcome | None = None,
     limit: int = Query(100, ge=1, le=500),
     offset: int = Query(0, ge=0),
-    _=Depends(require_role(Role.SUPER_ADMIN, Role.ADMIN)),
+    _=Depends(_audit_admin),
     db: AsyncSession = Depends(get_db),
 ):
     """list audit log entries (admin only) — sort desc by created_at"""

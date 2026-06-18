@@ -5,7 +5,6 @@ import pytest
 from httpx import AsyncClient
 
 from app.models.user import User
-from app.models.device import Device, DeviceStatus
 
 
 @pytest.mark.asyncio
@@ -116,16 +115,16 @@ async def test_player_group_with_devices(client: AsyncClient, super_admin: User)
         data={"username": super_admin.username, "password": "testpass123"},
     )
     access = login.json()["access_token"]
-    H = {"Authorization": f"Bearer {access}"}
+    headers = {"Authorization": f"Bearer {access}"}
 
     # devices 2 ตัว
-    d1 = (await client.post("/api/v1/devices", headers=H, json={"name": "D1"})).json()
-    d2 = (await client.post("/api/v1/devices", headers=H, json={"name": "D2"})).json()
+    d1 = (await client.post("/api/v1/devices", headers=headers, json={"name": "D1"})).json()
+    d2 = (await client.post("/api/v1/devices", headers=headers, json={"name": "D2"})).json()
 
     # group ที่มี d1
     g = await client.post(
         "/api/v1/groups",
-        headers=H,
+        headers=headers,
         json={"name": "Lobby Group", "device_ids": [d1["id"]]},
     )
     assert g.status_code == 201, g.text
@@ -134,7 +133,7 @@ async def test_player_group_with_devices(client: AsyncClient, super_admin: User)
     # update เพิ่ม d2
     upd = await client.patch(
         f"/api/v1/groups/{g.json()['id']}",
-        headers=H,
+        headers=headers,
         json={"device_ids": [d1["id"], d2["id"]]},
     )
     assert upd.status_code == 200

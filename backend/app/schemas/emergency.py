@@ -2,10 +2,12 @@
 Schemas สำหรับ Emergency Broadcast endpoint
 """
 from __future__ import annotations
+
 from datetime import datetime
 from typing import Any
 from uuid import UUID
-from pydantic import BaseModel, Field, ConfigDict
+
+from pydantic import BaseModel, ConfigDict, Field
 
 from app.models.emergency import EmergencyKind, EmergencyStatus
 

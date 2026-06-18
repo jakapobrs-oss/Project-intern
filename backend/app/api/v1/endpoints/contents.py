@@ -2,19 +2,19 @@
 Content endpoints — upload + approve workflow (§22 + §21)
 """
 import uuid
-from datetime import datetime, timezone
+from datetime import UTC, datetime
+
 from fastapi import APIRouter, Depends, File, Form, HTTPException, Request, UploadFile
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.api.v1.deps import get_current_user, require_role
+from app.api.v1.deps import require_role
 from app.db import get_db
-from app.models.content import Content, ApprovalStatus, ContentType
-from app.models.user import User, Role
-from app.schemas.content import ContentOut, ContentUpdate, ContentCreateUrl, ApprovalAction
+from app.models.content import ApprovalStatus, Content, ContentType
+from app.models.user import Role, User
+from app.schemas.content import ApprovalAction, ContentCreateUrl, ContentOut, ContentUpdate
 from app.services import audit_service, content_service
 from app.services.content_service import ContentServiceError
-
 
 router = APIRouter()
 
@@ -52,7 +52,7 @@ async def upload_content(
             created_by=user.id,
         )
     except ContentServiceError as e:
-        raise HTTPException(status_code=400, detail={"code": e.code, "message": e.message})
+        raise HTTPException(status_code=400, detail={"code": e.code, "message": e.message}) from e
     return content
 
 
@@ -152,7 +152,7 @@ async def approve_content(
     if action.approve:
         content.approval_status = ApprovalStatus.APPROVED
         content.approved_by = user.id
-        content.approved_at = datetime.now(timezone.utc)
+        content.approved_at = datetime.now(UTC)
         content.rejection_reason = None
         audit_action = "content.approve"
         msg = f"approved content: {content.name}"
@@ -160,7 +160,7 @@ async def approve_content(
         content.approval_status = ApprovalStatus.REJECTED
         content.rejection_reason = action.rejection_reason or "ไม่ระบุเหตุผล"
         content.approved_by = user.id
-        content.approved_at = datetime.now(timezone.utc)
+        content.approved_at = datetime.now(UTC)
         audit_action = "content.reject"
         msg = f"rejected content: {content.name} ({content.rejection_reason})"
     await db.commit()

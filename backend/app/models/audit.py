@@ -11,7 +11,9 @@ AuditLog model — บันทึก action สำคัญทั้งหม�
 import enum
 import uuid
 from datetime import datetime
-from sqlalchemy import String, DateTime, Enum as SAEnum, Uuid, JSON, Text, func
+
+from sqlalchemy import JSON, DateTime, String, Text, Uuid, func
+from sqlalchemy import Enum as SAEnum
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.db import Base

@@ -8,14 +8,15 @@ Tasks:
 แยกออกจาก worker.py หลักเพื่อให้ test ได้อิสระ
 """
 from __future__ import annotations
-from datetime import datetime, timezone
+
+from datetime import UTC, datetime
+
 from loguru import logger
 from sqlalchemy import select, update
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
 from app.config import settings
 from app.models.emergency import EmergencyBroadcast, EmergencyStatus
-
 
 # engine สำหรับ worker — ใช้แยกจาก request scope (FastAPI Depends)
 # ใน worker ไม่มี request lifecycle เลยต้องสร้าง engine ที่ระดับ module
@@ -37,7 +38,7 @@ async def expire_emergencies_in_session(db: AsyncSession) -> int:
     ส่วน logic ที่ test ได้ — ทำใน session ที่ caller ส่งมา
     return จำนวน row ที่ expire
     """
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
     stmt = (
         select(EmergencyBroadcast.id, EmergencyBroadcast.title)
         .where(EmergencyBroadcast.status == EmergencyStatus.ACTIVE)

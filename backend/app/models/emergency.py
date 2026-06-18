@@ -11,7 +11,9 @@ Flow:
 import enum
 import uuid
 from datetime import datetime
-from sqlalchemy import String, DateTime, Enum as SAEnum, Uuid, JSON, Text, Boolean, Integer, func
+
+from sqlalchemy import JSON, Boolean, DateTime, Integer, String, Text, Uuid, func
+from sqlalchemy import Enum as SAEnum
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.db import Base

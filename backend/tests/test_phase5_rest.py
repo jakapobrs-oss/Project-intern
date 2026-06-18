@@ -4,20 +4,21 @@ Phase 5 rest — tests สำหรับ:
 2. worker auto-expire emergency
 3. audit on more events (content.approve, schedule.activate/pause, device.pair, tv.command_sent)
 """
-from datetime import datetime, timedelta, timezone
 import uuid
+from datetime import UTC, datetime, timedelta
+
 import pytest
 import pytest_asyncio
 from sqlalchemy import select
 
 from app.models.audit import AuditLog, AuditOutcome
-from app.models.content import Content, ContentType, ApprovalStatus
+from app.models.content import ApprovalStatus, Content, ContentType
 from app.models.device import Device, DevicePlatform, DeviceStatus, PlayerGroup
 from app.models.emergency import EmergencyBroadcast, EmergencyKind, EmergencyStatus
-from app.models.schedule import Schedule, ScheduleStatus
 from app.models.plan import Plan
+from app.models.schedule import Schedule, ScheduleStatus
+from app.services.manifest_service import build_manifest
 from app.workers.emergency_tasks import expire_emergencies_in_session
-from app.services.manifest_service import build_manifest, _active_emergencies_for
 
 
 async def _login(client, username: str, password: str = "testpass123") -> str:
@@ -92,7 +93,7 @@ async def test_manifest_excludes_emergency_not_targeting_device(db_session, pair
 @pytest.mark.asyncio
 async def test_manifest_excludes_emergency_outside_time_window(db_session, paired_device, super_admin):
     """emergency ที่ end_at < now → ไม่ใส่ใน manifest (ถึงจะยัง status=ACTIVE)"""
-    past = datetime.now(timezone.utc) - timedelta(hours=1)
+    past = datetime.now(UTC) - timedelta(hours=1)
     emer = EmergencyBroadcast(
         title="หมดอายุแล้ว",
         kind=EmergencyKind.TEXT,
@@ -137,8 +138,8 @@ async def test_manifest_version_changes_when_emergency_added(db_session, paired_
 @pytest.mark.asyncio
 async def test_expire_emergencies_marks_past_ends_at_as_expired(db_session, super_admin):
     """auto-expire: ACTIVE + ends_at < now → EXPIRED"""
-    past = datetime.now(timezone.utc) - timedelta(minutes=10)
-    future = datetime.now(timezone.utc) + timedelta(hours=1)
+    past = datetime.now(UTC) - timedelta(minutes=10)
+    future = datetime.now(UTC) + timedelta(hours=1)
 
     e_expired = EmergencyBroadcast(
         title="ควรหมดอายุ", kind=EmergencyKind.TEXT,
@@ -179,7 +180,7 @@ async def test_expire_emergencies_is_idempotent(db_session, super_admin):
         title="หมด", kind=EmergencyKind.TEXT,
         payload={"message": "x"}, target={"all": True},
         status=EmergencyStatus.ACTIVE,
-        ends_at=datetime.now(timezone.utc) - timedelta(seconds=1),
+        ends_at=datetime.now(UTC) - timedelta(seconds=1),
         created_by=super_admin.id,
     ))
     await db_session.commit()
@@ -317,8 +318,8 @@ async def test_audit_logged_when_schedule_activated(client, db_session, super_ad
         name="ทดสอบ",
         plan_id=plan.id,
         player_group_id=group.id,
-        start_at=datetime.now(timezone.utc),
-        end_at=datetime.now(timezone.utc) + timedelta(days=1),
+        start_at=datetime.now(UTC),
+        end_at=datetime.now(UTC) + timedelta(days=1),
         status=ScheduleStatus.PENDING_APPROVAL,
         created_by=super_admin.id,
     )

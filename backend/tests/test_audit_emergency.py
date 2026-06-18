@@ -5,7 +5,6 @@ import pytest
 from sqlalchemy import select
 
 from app.models.audit import AuditLog, AuditOutcome
-from app.models.emergency import EmergencyBroadcast, EmergencyStatus
 
 
 async def _login(client, username: str, password: str = "testpass123") -> str:

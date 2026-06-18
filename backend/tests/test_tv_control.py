@@ -2,8 +2,8 @@
 ทดสอบ TV protocol builders (pure functions — ไม่ต้อง mock hardware)
 """
 import pytest
-from app.services.tv_control import build_command, TVCommand, TVCommandType, TVBrand
 
+from app.services.tv_control import TVBrand, TVCommand, TVCommandType, build_command
 
 # ===== Samsung MDC =====
 

@@ -4,8 +4,7 @@
 import pytest
 from httpx import AsyncClient
 
-from app.models.user import User, Role
-
+from app.models.user import User
 
 # ===== Login =====
 

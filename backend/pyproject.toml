@@ -8,6 +8,21 @@ target-version = "py312"
 select = ["E", "F", "W", "I", "N", "UP", "B", "C4", "SIM"]
 ignore = ["E501"]  # line length จัดการเอง
 
+# FastAPI ใช้ Depends()/Query()/File()/Form() เป็นค่า default ของ argument โดยตั้งใจ
+# (เป็น idiom มาตรฐานของ framework) → บอก bugbear ว่า call เหล่านี้ปลอดภัย ไม่ต้องเตือน B008
+[tool.ruff.lint.flake8-bugbear]
+extend-immutable-calls = [
+    "fastapi.Depends",
+    "fastapi.Query",
+    "fastapi.Path",
+    "fastapi.Body",
+    "fastapi.Header",
+    "fastapi.Cookie",
+    "fastapi.Form",
+    "fastapi.File",
+    "fastapi.Security",
+]
+
 [tool.mypy]
 python_version = "3.12"
 strict = false

@@ -2,12 +2,12 @@
 SQLAlchemy 2.x async engine + session factory
 ใช้ asyncpg เป็น driver
 """
-from typing import AsyncGenerator
+from collections.abc import AsyncGenerator
+
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 from sqlalchemy.orm import DeclarativeBase
 
 from app.config import settings
-
 
 # Engine — pool size ค่า default ของ SQLAlchemy คือ 5 + overflow 10 (พอ dev)
 # production จะ tune ผ่าน env ภายหลัง (ดู §27 Reliability)

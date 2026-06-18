@@ -7,21 +7,25 @@ Player endpoints — เรียกโดย player device (ไม่ใช่ 
 - POST /player/heartbeat     — ping + telemetry
 - GET  /player/manifest      — pull manifest (§35.2)
 """
+from datetime import UTC
 from typing import Annotated
+
 from fastapi import APIRouter, Depends, Header, HTTPException, Request, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.db import get_db
-from app.models.device import Device
 from app.models.audit import AuditOutcome
+from app.models.device import Device
 from app.schemas.device import (
-    PairingClaimRequest, PairingClaimResponse,
-    HeartbeatRequest, HeartbeatResponse, DeviceOut,
+    DeviceOut,
+    HeartbeatRequest,
+    HeartbeatResponse,
+    PairingClaimRequest,
+    PairingClaimResponse,
 )
 from app.schemas.manifest import Manifest
 from app.services import audit_service, device_service, manifest_service
 from app.services.device_service import DeviceServiceError
-
 
 router = APIRouter()
 
@@ -77,7 +81,7 @@ async def pair(
         raise HTTPException(
             code_to_status.get(e.code, 400),
             detail={"code": e.code, "message": e.message},
-        )
+        ) from e
 
     # audit success (Phase 5 rest)
     await audit_service.log_event(
@@ -93,11 +97,11 @@ async def pair(
         **ctx,
     )
 
-    from datetime import datetime, timezone
+    from datetime import datetime
     return PairingClaimResponse(
         device_id=device.id,
         device_token=token,
-        server_time=datetime.now(timezone.utc),
+        server_time=datetime.now(UTC),
     )
 
 
@@ -130,9 +134,9 @@ async def heartbeat(
     manifest = await manifest_service.build_manifest(db, device)
     outdated = (payload.current_manifest_version or "") != manifest.version
 
-    from datetime import datetime, timezone
+    from datetime import datetime
     return HeartbeatResponse(
-        server_time=datetime.now(timezone.utc),
+        server_time=datetime.now(UTC),
         manifest_outdated=outdated,
         latest_manifest_version=manifest.version,
     )
@@ -153,7 +157,7 @@ async def get_manifest(
 
 # ===== TV Command queue — player polls + acks (§24) =====
 
-from app.schemas.tv_control import TVCommandInQueue, TVCommandAck  # noqa: E402
+from app.schemas.tv_control import TVCommandAck, TVCommandInQueue  # noqa: E402
 from app.services.tv_control import queue as tv_queue  # noqa: E402
 
 

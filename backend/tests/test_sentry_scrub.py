@@ -4,10 +4,8 @@ Phase 7 polish — Sentry PII scrubber tests
 ทดสอบ pure functions ใน core/sentry.py โดยตรง
 ไม่ต้องการ sentry_sdk ติดตั้ง (test logic เท่านั้น)
 """
-import pytest
 
 from app.core.sentry import _before_send, _mask_email, _mask_phone, _scrub_value
-
 
 # ─── Helpers ─────────────────────────────────────────────────────────
 

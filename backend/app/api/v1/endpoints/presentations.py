@@ -2,19 +2,21 @@
 Presentation endpoints (§35.1 — layer ใหม่ระหว่าง content กับ plan)
 """
 import uuid
+
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import select
-from sqlalchemy.orm import selectinload
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
 
 from app.api.v1.deps import require_role
 from app.db import get_db
 from app.models.presentation import Presentation, PresentationZone
-from app.models.user import User, Role
+from app.models.user import Role, User
 from app.schemas.presentation import (
-    PresentationCreate, PresentationUpdate, PresentationOut,
+    PresentationCreate,
+    PresentationOut,
+    PresentationUpdate,
 )
-
 
 router = APIRouter()
 

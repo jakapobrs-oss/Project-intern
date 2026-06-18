@@ -2,7 +2,8 @@
 Schedule endpoints — editor บันทึก, approver กด active (§21, §23)
 """
 import uuid
-from datetime import datetime, timezone
+from datetime import UTC, datetime
+
 from fastapi import APIRouter, Depends, HTTPException, Request
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -10,10 +11,9 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.api.v1.deps import require_role
 from app.db import get_db
 from app.models.schedule import Schedule, ScheduleStatus
-from app.models.user import User, Role
-from app.schemas.plan import ScheduleCreate, ScheduleUpdate, ScheduleOut
+from app.models.user import Role, User
+from app.schemas.plan import ScheduleCreate, ScheduleOut, ScheduleUpdate
 from app.services import audit_service
-
 
 router = APIRouter()
 
@@ -47,7 +47,7 @@ async def create_schedule(
     )
     if status == ScheduleStatus.ACTIVE:
         sch.approved_by = user.id
-        sch.approved_at = datetime.now(timezone.utc)
+        sch.approved_at = datetime.now(UTC)
     db.add(sch)
     await db.commit()
     await db.refresh(sch)
@@ -107,7 +107,7 @@ async def approve_schedule(
         raise HTTPException(400, f"สถานะปัจจุบัน {sch.status.value} approve ไม่ได้")
     sch.status = ScheduleStatus.ACTIVE
     sch.approved_by = user.id
-    sch.approved_at = datetime.now(timezone.utc)
+    sch.approved_at = datetime.now(UTC)
     await db.commit()
     await db.refresh(sch)
 

@@ -17,19 +17,24 @@ seed_demo.py — สร้างข้อมูล demo ให้ user เห็
 ⚠ ห้ามรันบน production — มี password ที่เดาง่าย
 """
 import asyncio
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 
 from sqlalchemy import select
 
 from app.core.security import hash_password
 from app.db import SessionLocal
-from app.models.user import User, Role
-from app.models.device import Device, PlayerGroup, DevicePlatform, DeviceStatus
-from app.models.device import _gen_pairing_code   # type: ignore[attr-defined]
-from app.models.content import Content, ContentType, ApprovalStatus
-from app.models.presentation import Presentation, PresentationZone
+from app.models.content import ApprovalStatus, Content, ContentType
+from app.models.device import (
+    Device,
+    DevicePlatform,
+    DeviceStatus,
+    PlayerGroup,
+    _gen_pairing_code,  # type: ignore[attr-defined]
+)
 from app.models.plan import Plan, PlanItem
+from app.models.presentation import Presentation, PresentationZone
 from app.models.schedule import Schedule, ScheduleStatus
+from app.models.user import Role, User
 
 
 async def _get_or_create_user(db, *, username, email, full_name, role, password):
@@ -59,7 +64,7 @@ async def seed_demo() -> None:
             return
 
         print("👥 Users:")
-        editor = await _get_or_create_user(
+        await _get_or_create_user(
             db, username="editor1", email="editor1@demo.local",
             full_name="Demo Editor", role=Role.EDITOR, password="editor123",
         )
@@ -92,7 +97,7 @@ async def seed_demo() -> None:
                 name=name, location=location, platform=platform,
                 tv_brand=brand, status=DeviceStatus.UNPAIRED,
                 pairing_code=_gen_pairing_code(),
-                pairing_code_expires_at=datetime.now(timezone.utc) + timedelta(hours=24),
+                pairing_code_expires_at=datetime.now(UTC) + timedelta(hours=24),
             )
             db.add(d)
             await db.flush()
@@ -126,7 +131,7 @@ async def seed_demo() -> None:
                 print(f"  · content '{name}' มีอยู่แล้ว — skip")
                 contents.append(existing)
                 continue
-            now = datetime.now(timezone.utc)
+            now = datetime.now(UTC)
             c = Content(
                 name=name, description=f"demo: {name}",
                 type=ctype, url=url,
@@ -184,7 +189,7 @@ async def seed_demo() -> None:
         res = await db.execute(select(Schedule).where(Schedule.name == "schedule demo"))
         sched = res.scalar_one_or_none()
         if sched is None:
-            now = datetime.now(timezone.utc)
+            now = datetime.now(UTC)
             sched = Schedule(
                 name="schedule demo", description="auto-generated",
                 plan_id=plan.id, player_group_id=group.id,

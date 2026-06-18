@@ -6,12 +6,12 @@ Content service — upload pipeline (§22)
 """
 import uuid
 from typing import BinaryIO
+
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.core.storage import upload_fileobj, sha256_stream, ensure_bucket
+from app.core.storage import ensure_bucket, sha256_stream, upload_fileobj
 from app.models.content import Content, ContentType
-
 
 # Magic bytes — ส่วนต้นของไฟล์ที่บ่งบอก type จริง (§22)
 # format: (magic_bytes, mime_type, content_type)

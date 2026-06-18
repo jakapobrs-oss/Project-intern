@@ -13,11 +13,12 @@ Security & rate-limit middleware (Phase 7 hardening)
     เปิดเมื่อ migrate ไป httpOnly cookie ผ่าน settings.csrf_enabled
 """
 from __future__ import annotations
+
 import hmac
 import secrets
 import time
 from collections import defaultdict, deque
-from typing import Callable
+from collections.abc import Callable
 
 from fastapi import Request, Response
 from starlette.middleware.base import BaseHTTPMiddleware
