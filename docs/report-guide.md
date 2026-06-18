@@ -351,11 +351,17 @@ open http://localhost:9001                     # MinIO console (minioadmin/minio
 | `APP_TIMEZONE` | Asia/Bangkok |
 | `RATE_LIMIT_*` / `CSRF_ENABLED` | การ hardening ความปลอดภัย |
 
-### ภาคผนวก ง — ตาราง API เต็ม
-- คัดจาก Swagger UI (`/api/docs`) หรือสรุปจากข้อ 6.5
+### ภาคผนวก ง — ตาราง API เต็ม (63 endpoints)
+- ดู **[docs/api-reference.md](api-reference.md)** — สร้างอัตโนมัติจาก OpenAPI จริง (method / path / auth / สรุป แยกตามกลุ่ม) หรือดู interactive ที่ `/api/docs`
 
 ### ภาคผนวก จ — ER Diagram
 - คัดบล็อก Mermaid จาก `docs/er-diagram.md`
+
+### ภาคผนวก ฉ — Data Dictionary (พจนานุกรมข้อมูล)
+- ดู **[docs/data-dictionary.md](data-dictionary.md)** — ทุกตาราง/คอลัมน์/ชนิด/คีย์ สร้างจาก SQLAlchemy models จริง (12 ตาราง)
+
+### ภาคผนวก ช — Use-case & Sequence Diagrams
+- ดู **[docs/diagrams.md](diagrams.md)** — use-case + sequence (login, อนุมัติสื่อ, จับคู่จอ+manifest, คุมทีวี, ฉุกเฉิน) แบบ Mermaid พร้อม export PNG
 
 ---
 
@@ -394,7 +400,9 @@ open http://localhost:9001                     # MinIO console (minioadmin/minio
 | ภาพรวม + Quick Start | `README.md` |
 | สถาปัตยกรรม | `docs/architecture.md` |
 | ER / ฐานข้อมูล | `docs/er-diagram.md` |
-| API | `docs/api.md` + Swagger `/api/docs` |
+| API (เต็ม 63 endpoints) | `docs/api-reference.md` + Swagger `/api/docs` |
+| Data dictionary | `docs/data-dictionary.md` |
+| Use-case / Sequence | `docs/diagrams.md` |
 | การ deploy | `docs/deployment.md`, `docs/production-deployment.md` |
 | โมเดลข้อมูล | `backend/app/models/` |
 | ตรรกะธุรกิจ | `backend/app/services/` |
