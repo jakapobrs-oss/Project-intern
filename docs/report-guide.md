@@ -64,7 +64,7 @@
 >
 > ระบบออกแบบเป็นสถาปัตยกรรมแยกส่วน (Backend API, Admin Web UI, Player) ใช้รูปแบบ **Pre-computed Manifest** เพื่อให้เครื่องเล่น (Player) ทำงานแบบ offline-friendly และจัดโครงสร้างเนื้อหาแบบ **ลำดับชั้น 5 ระดับ** เพื่อให้นำสื่อกลับมาใช้ซ้ำได้ มีระบบสิทธิ์ผู้ใช้ (RBAC) 7 บทบาท พร้อมระบบ Audit Log, Monitoring และ Backup
 >
-> ผลการดำเนินงานสามารถพัฒนาได้ครบ Phase 0–6 ครอบคลุม API จำนวน 58 endpoint พร้อมชุดทดสอบอัตโนมัติ 90 รายการ และ Admin UI 13 หน้า
+> ผลการดำเนินงานสามารถพัฒนาได้ครบ Phase 0–6 ครอบคลุม API จำนวน 63 endpoint พร้อมชุดทดสอบอัตโนมัติ 90 รายการ และ Admin UI 13 หน้า
 
 **คำสำคัญ (Keywords):** Digital Signage, FastAPI, PostgreSQL, HDMI-CEC, RS-232, RBAC, Docker
 
@@ -124,6 +124,39 @@
 | HDMI-CEC | โปรโตคอลควบคุมอุปกรณ์ผ่านสาย HDMI |
 | RS-232 | พอร์ตอนุกรมสำหรับสั่งงานทีวีระดับมืออาชีพ |
 
+### 1.7 วิธีดำเนินโครงงาน (Methodology)
+> หมายเหตุ: บางสถาบันจัดหัวข้อนี้ไว้ที่ "บทที่ 3 วิธีดำเนินโครงงาน" — ย้ายได้ตามเทมเพลต
+
+พัฒนาด้วยกระบวนการ **Iterative & Incremental** (ทำทีละส่วน เพิ่มความสามารถทีละ Phase) — แต่ละ Phase ทำครบวงจรย่อย: **วิเคราะห์ → ออกแบบ → พัฒนา → ทดสอบ → ทบทวน** แล้วต่อยอด Phase ถัดไป เหมาะกับระบบที่ขอบเขตใหญ่แต่ความต้องการชัด
+
+**ขั้นตอนการพัฒนาซอฟต์แวร์ (SDLC):**
+1. **รวบรวม/วิเคราะห์ความต้องการ** — สรุปฟังก์ชัน, ผู้ใช้และบทบาท (RBAC), ขอบเขต
+2. **ออกแบบระบบ** — สถาปัตยกรรม, ฐานข้อมูล (ER), API, UI, โปรโตคอลคุมทีวี
+3. **พัฒนา (Implement)** — แยก Backend / Admin UI / Player พัฒนาขนานกัน
+4. **ทดสอบ (Test)** — unit/integration test อัตโนมัติ (pytest) + smoke E2E ทุก Phase
+5. **ทบทวน/ปรับปรุง** — review + refactor แล้วขึ้น Phase ถัดไป
+
+**เครื่องมือที่ใช้ในกระบวนการ:**
+| ด้าน | เครื่องมือ |
+|---|---|
+| Version control / ทำงานร่วม | Git + GitHub (branch, Pull Request, review) |
+| CI (ตรวจอัตโนมัติเมื่อ push) | GitHub Actions — lint (ruff) + test (pytest) + build + security scan |
+| สภาพแวดล้อม dev/prod เหมือนกัน | Docker Compose |
+| ทดสอบ | pytest (90 เคส) + script E2E |
+| เอกสาร API อัตโนมัติ | OpenAPI / Swagger (จาก FastAPI) |
+
+**แผนการดำเนินงานรายสัปดาห์ (ตัวอย่าง — ปรับตามจริง แล้วทำเป็น Gantt chart):**
+| สัปดาห์ | งาน (Phase) |
+|---|---|
+| 1 | ศึกษาความต้องการ + วางโครงสร้างโปรเจกต์ (Phase 0) |
+| 2 | Auth + ผู้ใช้ + สิทธิ์ RBAC (Phase 1) |
+| 3 | อุปกรณ์/จอ + เนื้อหา + อนุมัติ (Phase 2) |
+| 4 | Presentation/Plan/Schedule + Manifest (Phase 3) |
+| 5 | ควบคุมทีวี HDMI-CEC/RS-232 (Phase 4) |
+| 6 | ฉุกเฉิน + Monitoring + Audit (Phase 5) |
+| 7 | Admin UI 13 หน้า (Phase 6) |
+| 8 | ทดสอบรวม + เก็บผล + เขียนเล่ม + ส่งมอบ |
+
 ---
 
 ## 5) บทที่ 2 — ทฤษฎีและเทคโนโลยีที่เกี่ยวข้อง
@@ -156,6 +189,28 @@
 - **iCalendar RRULE (RFC 5545)** — กฎการเล่นซ้ำของตารางเวลา
 - **HDMI-CEC & RS-232 Serial Protocol** — การสื่อสารควบคุมฮาร์ดแวร์ทีวี
 - **PWA & Service Worker** — เครื่องเล่นแบบ offline-friendly
+
+### 2.4 ระบบที่เกี่ยวข้อง (Related Work / การศึกษาเปรียบเทียบ)
+มีระบบ Digital Signage ทั้งแบบ Open Source และเชิงพาณิชย์อยู่หลายตัว — ศึกษาเปรียบเทียบเพื่อหา "ช่องว่าง" ที่โครงงานนี้เข้าไปเติม
+
+| คุณสมบัติ | Xibo | Yodeck | ScreenCloud | **ระบบนี้** |
+|---|---|---|---|---|
+| รูปแบบ | Open Source (AGPL) + Cloud | SaaS (คลาวด์) | SaaS (คลาวด์) | **Open Source / Self-host** |
+| ติดตั้งบนเซิร์ฟเวอร์ตัวเอง | ได้ | ไม่ได้ | ไม่ได้ | **ได้** |
+| ค่าใช้จ่าย | ฟรี (self-host) / จ่ายคลาวด์ | จ่ายรายจอ | จ่ายรายจอ | **ฟรี** |
+| สิทธิ์ผู้ใช้ (RBAC) | มี (group/permission) | มี (จำกัด) | มี | **7 บทบาท** |
+| Workflow อนุมัติเนื้อหา | จำกัด | ไม่มี | จำกัด | **มี (submit→approve)** |
+| คุมฮาร์ดแวร์ทีวี RS-232 หลายยี่ห้อ | ไม่มี | จำกัด | ไม่มี | **มี (7 โปรโตคอล)** |
+| HDMI-CEC | บางแพลตฟอร์ม | บางอุปกรณ์ | ไม่เน้น | **มี** |
+| ประกาศฉุกเฉินแทรกทับ (override) | ใช้ priority แทน | ไม่มีเฉพาะ | ไม่มีเฉพาะ | **มี + auto-expire** |
+| ทำงานต่อเมื่อเน็ตหลุด (offline) | มี (cache) | มี | จำกัด | **มี (pre-computed manifest)** |
+
+> ข้อมูล ณ ปี 2026 จากเอกสารสาธารณะของแต่ละผลิตภัณฑ์ — ควรตรวจสอบฟีเจอร์ล่าสุดก่อนอ้างอิงในเล่ม
+
+**ช่องว่างที่โครงงานนี้เติม (Research Gap):**
+- ระบบเชิงพาณิชย์ (Yodeck/ScreenCloud) เป็นคลาวด์ มีค่าใช้จ่ายรายจอ และ **ติดตั้งภายในองค์กรเองไม่ได้** — ไม่เหมาะกับองค์กรที่ต้องการเก็บข้อมูลไว้ใน LAN ของตน
+- ระบบ Open Source (Xibo) แม้ self-host ได้ แต่ **ไม่มีการควบคุมฮาร์ดแวร์ทีวีระดับ RS-232 หลายยี่ห้อ** และไม่มี workflow อนุมัติ + ประกาศฉุกเฉินเป็นฟีเจอร์หลัก
+- โครงงานนี้รวม **(1) self-host ฟรี + (2) คุมทีวีหลายยี่ห้อ CEC/RS-232 + (3) อนุมัติเนื้อหา + (4) ประกาศฉุกเฉิน override** ไว้ในระบบเดียว ซึ่งยังไม่พบครบในผลิตภัณฑ์เดียวที่ศึกษา
 
 ---
 
@@ -220,23 +275,25 @@ Admin UI (Next.js) ──HTTPS──▶ Backend API (FastAPI) ──SQL──▶
 4. **Plan** — ลำดับของ Presentation (ปรับ duration ได้)
 5. **Schedule** — จับ Plan กับกลุ่มจอ + เวลา + ลำดับความสำคัญ
 
-### 6.5 รายการ API (สรุป — 58 endpoints, 11 กลุ่ม)
-อ้างอิง `backend/app/api/v1/endpoints/` (ดู Swagger เต็มที่ `/api/docs`):
+### 6.5 รายการ API (สรุป — 63 endpoints, 13 กลุ่ม)
+อ้างอิง `backend/app/api/v1/endpoints/` — รายการเต็มดู `docs/api-reference.md` หรือ Swagger `/api/docs`:
 
 | กลุ่ม | Prefix | จำนวน | หน้าที่หลัก |
 |---|---|---|---|
-| Auth | `/api/v1/auth` | 5 | login, refresh, logout, me |
+| Auth | `/api/v1/auth` | 5 | login, refresh, logout, me, csrf |
 | Users | `/api/v1/users` | 5 | CRUD ผู้ใช้ + role |
-| Devices | `/api/v1/devices` | 6 | pair, list, heartbeat, สถานะ |
-| Contents | `/api/v1/contents` | 8 | upload, approve/reject, list |
+| Devices | `/api/v1/devices` | 6 | สร้าง/แก้/ลบจอ + regenerate pairing |
+| Player Groups | `/api/v1/groups` | 4 | จัดกลุ่มจอ (CRUD) |
+| Contents | `/api/v1/contents` | 8 | upload, url, submit, approve, CRUD |
 | Presentations | `/api/v1/presentations` | 5 | จัด layout + zones |
 | Plans | `/api/v1/plans` | 5 | จัดลำดับ presentation |
-| Schedules | `/api/v1/schedules` | 7 | ตั้งเวลา + อนุมัติ |
-| Player (pull) | `/api/v1/player` | 6 | ดึง manifest + media |
-| TV Control | `/api/v1/tv-control` | 2 | ส่งคำสั่งคุมทีวี |
-| Emergency | `/api/v1/emergency` | 6 | ประกาศฉุกเฉิน |
-| Monitoring | `/api/v1/...` | 3 | metrics, audit, readiness |
-| Health (meta) | `/healthz`, `/readiness`, `/metrics` | — | liveness / readiness / prometheus |
+| Schedules | `/api/v1/schedules` | 7 | ตั้งเวลา + อนุมัติ + pause |
+| Player (pull) | `/api/v1/player` | 6 | pair, heartbeat, manifest, commands |
+| TV Control | `/api/v1/tv` | 2 | ส่งคำสั่ง + ดูสถานะคำสั่ง |
+| Emergency | `/api/v1/emergency` | 6 | ประกาศฉุกเฉิน + activate/cancel |
+| Monitoring | `/api/v1/audit` | 1 | audit logs |
+| Meta | `/`, `/api/v1/ping`, `/healthz` | 3 | root / ping / liveness |
+| **รวม** | | **63** | |
 
 ### 6.6 การควบคุมทีวี (TV Control)
 อ้างอิง `backend/app/services/tv_control/base.py`:
@@ -285,13 +342,54 @@ Admin UI (Next.js) ──HTTPS──▶ Backend API (FastAPI) ──SQL──▶
 
 ### 7.3 ภาพหน้าจอผลงาน (ต้องแคปใส่เล่ม) — ดูรายการในข้อ 11
 
+### 7.4 การประเมินผลระบบ (Evaluation)
+
+#### 7.4.1 การประเมินความครบถ้วนของฟังก์ชัน (Functional Coverage)
+ตรวจว่าทำได้ครบตามวัตถุประสงค์ (ข้อ 1.2) หรือไม่ — แต่ละข้อมีฟังก์ชันจริง + เทสต์ยืนยัน
+
+| วัตถุประสงค์ | ฟังก์ชันที่ทำได้ | ทดสอบโดย | ผล |
+|---|---|---|---|
+| 1. บริหารเนื้อหา/จอรวมศูนย์ผ่านเว็บ | Admin UI 13 หน้า + 63 API | `test_content_pipeline.py` | ✅ ผ่าน |
+| 2. ผังการเล่น + ตารางเวลาตามกลุ่มจอ | Plan/Schedule + RRULE + manifest | `test_phase5_rest.py` | ✅ ผ่าน |
+| 3. ควบคุมทีวี CEC/RS-232 | 7 โปรโตคอล + 12 คำสั่ง | `test_tv_control.py` (15) | ✅ ผ่าน |
+| 4. ประกาศฉุกเฉินแทรกทับทันที | Emergency override + auto-expire | `test_audit_emergency.py` | ✅ ผ่าน |
+| 5. สิทธิ์ + อนุมัติ + Audit | RBAC 7 บทบาท + approval + audit log | `test_auth.py` (15) | ✅ ผ่าน |
+
+#### 7.4.2 ผลการทดสอบอัตโนมัติ (Automated Test Result)
+- รัน `pytest tests/` → **ผ่านทั้งหมด 90 / 90 รายการ (100%)**
+- ครอบคลุม: auth/RBAC, คุมทีวี, อนุมัติเนื้อหา, จับคู่จอ, ฉุกเฉิน, ความปลอดภัย (rate-limit/header), การปกปิดข้อมูลใน log
+- รันบน CI (GitHub Actions) อัตโนมัติทุกครั้งที่ push → ป้องกัน regression
+> 💡 แคปผลรัน pytest (เขียว 90 passed) เป็น "รูปที่ 17" ใส่เล่ม
+
+#### 7.4.3 การประเมินคุณสมบัติเชิงคุณภาพ (Non-functional)
+| ด้าน | กลไกในระบบ | หลักฐาน |
+|---|---|---|
+| ความปลอดภัย | JWT + RBAC + rate limit + security headers + audit | `test_security_middleware.py` (8) |
+| ความทนทาน (offline) | Player cache manifest + exponential backoff + LRU | Phase F |
+| ความเป็นส่วนตัว (PDPA) | scrub ข้อมูลอ่อนไหวก่อนเข้า log/Sentry | `test_sentry_scrub.py` (11) |
+| ตรวจสอบย้อนหลัง | audit log แบบ append-only ทุก action สำคัญ | ตาราง `audit_logs` |
+
+#### 7.4.4 ตัวชี้วัดเชิงปริมาณที่ควรวัดเพิ่ม (แนะนำ — 【วัด/บันทึกเอง】)
+เพื่อยกระดับความเป็นงานวิจัย ควรเก็บค่าจริงจากการทดลองใช้ แล้วนำมาใส่เป็นตารางผล:
+
+| ตัวชี้วัด | วิธีวัด | ค่าที่วัดได้ |
+|---|---|---|
+| เวลาสร้าง Manifest (ms) | จับเวลา API `GET /player/manifest` | 【วัดเอง】 |
+| เวลาตอบสนอง API p95 (ms) | ทดสอบโหลดด้วย k6 / Locust | 【วัดเอง】 |
+| เวลาสั่งคุมทีวี → ทีวีตอบสนอง (วินาที) | จับเวลา enqueue → ack | 【วัดเอง】 |
+| จำนวนจอที่รองรับพร้อมกัน | เพิ่ม player จนระบบเริ่มช้า | 【วัดเอง】 |
+| เวลา player กู้คืนเมื่อเน็ตกลับมา (วินาที) | ตัดเน็ต → ต่อใหม่ จับเวลา | 【วัดเอง】 |
+
+#### 7.4.5 การประเมินโดยผู้ใช้ (แนะนำ — 【เก็บแบบสอบถามเอง】)
+ให้ผู้ใช้จริง (เช่น เจ้าหน้าที่ฝ่ายสื่อสาร) ทดลองใช้ แล้วประเมินด้วยแบบสอบถาม (Likert 5 ระดับ) เช่น ความง่ายในการใช้งาน / ความเร็ว / ความครบของฟีเจอร์ — สรุปเป็นค่าเฉลี่ย + ส่วนเบี่ยงเบนมาตรฐานใส่เล่ม
+
 ---
 
 ## 8) บทที่ 5 — สรุปผลและข้อเสนอแนะ
 
 ### 8.1 สรุปผลการดำเนินงาน
 - พัฒนาระบบจัดการจอประชาสัมพันธ์ได้ครบตามวัตถุประสงค์ Phase 0–6 + Player polish
-- ครอบคลุม Backend API 58 endpoint, Admin UI 13 หน้า, Player ทั้ง Web (PWA) และ Android
+- ครอบคลุม Backend API 63 endpoint, Admin UI 13 หน้า, Player ทั้ง Web (PWA) และ Android
 - ผ่านชุดทดสอบอัตโนมัติ 90 รายการ
 
 ### 8.2 ปัญหาและอุปสรรค 【เรียบเรียงจากประสบการณ์จริง — ตัวอย่าง】
@@ -318,6 +416,9 @@ Admin UI (Next.js) ──HTTPS──▶ Backend API (FastAPI) ──SQL──▶
 - Next.js Documentation — https://nextjs.org/docs
 - RFC 5545 (iCalendar) — https://datatracker.ietf.org/doc/html/rfc5545
 - Docker Documentation — https://docs.docker.com
+- JSON Web Token (RFC 7519) — https://datatracker.ietf.org/doc/html/rfc7519
+- HDMI-CEC (CEC 1.4) / libcec — https://libcec.pulse-eight.com
+- _ระบบที่เกี่ยวข้อง (ข้อ 2.4):_ Xibo — https://xibo.org.uk · Yodeck — https://www.yodeck.com · ScreenCloud — https://screencloud.com
 > จัดรูปแบบอ้างอิงตามที่สถาบันกำหนด (APA / IEEE)
 
 ---
@@ -391,6 +492,11 @@ open http://localhost:9001                     # MinIO console (minioadmin/minio
 - ☐ ตารางที่ 4 — คำสั่ง/ยี่ห้อทีวีที่รองรับ (ข้อ 6.6)
 - ☐ ตารางที่ 5 — ผลการพัฒนาตาม Phase (ข้อ 7.1)
 - ☐ ตารางที่ 6 — สรุปการทดสอบ (ข้อ 7.2)
+- ☐ ตารางที่ 7 — เปรียบเทียบระบบที่เกี่ยวข้อง (ข้อ 2.4)
+- ☐ ตารางที่ 8 — เครื่องมือในกระบวนการพัฒนา (ข้อ 1.7)
+- ☐ ตารางที่ 9 — แผนการดำเนินงานรายสัปดาห์ (ข้อ 1.7)
+- ☐ ตารางที่ 10 — การประเมินความครบถ้วนของฟังก์ชัน (ข้อ 7.4.1)
+- ☐ ตารางที่ 11 — ตัวชี้วัดเชิงปริมาณที่ควรวัด (ข้อ 7.4.4)
 
 ---
 
