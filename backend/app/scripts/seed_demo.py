@@ -65,15 +65,15 @@ async def seed_demo() -> None:
 
         print("👥 Users:")
         await _get_or_create_user(
-            db, username="editor1", email="editor1@demo.local",
+            db, username="editor1", email="editor1@demo.com",
             full_name="Demo Editor", role=Role.EDITOR, password="editor123",
         )
         await _get_or_create_user(
-            db, username="approver1", email="approver1@demo.local",
+            db, username="approver1", email="approver1@demo.com",
             full_name="Demo Approver", role=Role.APPROVER, password="approver123",
         )
         await _get_or_create_user(
-            db, username="operator1", email="operator1@demo.local",
+            db, username="operator1", email="operator1@demo.com",
             full_name="Demo Operator", role=Role.OPERATOR, password="operator123",
         )
         actor_id = super_admin.id
