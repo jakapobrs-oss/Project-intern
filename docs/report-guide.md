@@ -297,13 +297,38 @@ Admin UI (Next.js) ──HTTPS──▶ Backend API (FastAPI) ──SQL──▶
 
 ### 6.6 การควบคุมทีวี (TV Control)
 อ้างอิง `backend/app/services/tv_control/base.py`:
-- **รองรับ 7 แบบ:** Samsung (MDC), LG (RS-232C), Sony (SimpleIP/IR), Panasonic, NEC, Toshiba และ **HDMI-CEC** (ทีวีทั่วไป)
-- **12 คำสั่ง:** power_on, power_off, volume_up, volume_down, mute, unmute, set_volume(0–100), input_hdmi1/2/3, get_status
-- คำสั่งถูกส่งผ่าน **Redis queue** ไปยัง player แล้วบันทึกลง audit_log
+- **รองรับ 7 ยี่ห้อ/โปรโตคอล** (`TVBrand` enum):
+
+| ยี่ห้อ | โปรโตคอล/รูปแบบคำสั่ง |
+|---|---|
+| Samsung | MDC (binary: header `0xAA` + checksum) |
+| LG | RS-232C (ASCII เช่น `ka 01 01\r`) |
+| Sony | SimpleIP (เช่น `*SCPOWR…`) |
+| Panasonic | Serial STX/ETX (`PON`/`POF`) |
+| NEC | NEC monitor protocol (binary + checksum) |
+| Toshiba | ใช้ HDMI-CEC (fallback) |
+| (ทีวีทั่วไป) | **HDMI-CEC** ผ่าน libcec |
+
+- **11 คำสั่ง** (`TVCommandType` enum): power_on, power_off, volume_up, volume_down, mute, unmute, set_volume (0–100), input_hdmi1/2/3, get_status
+- คำสั่งถูกแปลงเป็น raw bytes ตามยี่ห้อ → ส่งผ่าน **Redis queue** ไปยัง player → player ส่งออก serial/CEC แล้วตอบ ack กลับ + บันทึก audit log
+> หมายเหตุ: บางยี่ห้อรองรับเฉพาะบางคำสั่ง (เช่น CEC รองรับ power/volume/mute) — รายละเอียดดู `base.py`
 
 ### 6.7 การออกแบบส่วนติดต่อผู้ใช้ (Admin UI — 13 หน้า)
 อ้างอิง `admin-ui/src/app/`:
 `login`, `dashboard`, `devices`, `device detail`, `groups`, `contents`, `presentations`, `plans`, `schedules`, `tv-control`, `emergency`, `users`, `audit`
+
+### 6.8 ค่าพารามิเตอร์/นโยบายของระบบ (ยืนยันจากโค้ดจริง)
+| พารามิเตอร์ | ค่า | อ้างอิงในโค้ด |
+|---|---|---|
+| อายุ Access token | 30 นาที | `JWT_ACCESS_EXPIRE_MINUTES` |
+| อายุ Refresh token | 7 วัน | `JWT_REFRESH_EXPIRE_DAYS` |
+| อายุ Device token | 365 วัน (1 ปี) | `DEVICE_TOKEN_EXPIRE_DAYS` |
+| อัลกอริทึม JWT | HS256 | `JWT_ALGORITHM` |
+| ล็อกบัญชีเมื่อ login ผิดติดกัน | 5 ครั้ง | `MAX_FAILED_LOGIN = 5` |
+| Rate limit `/auth/login` | 10 ครั้ง / 60 วินาที | `RATE_LIMIT_MAX_REQUESTS` / `_WINDOW_SEC` |
+| ชนิดเนื้อหา | 5 — image / video / web / stream / text | `ContentType` |
+| สถานะอนุมัติเนื้อหา | 4 — draft / pending / approved / rejected | `ApprovalStatus` |
+| Timezone ระบบ | Asia/Bangkok | `APP_TIMEZONE` |
 
 ---
 
@@ -351,7 +376,7 @@ Admin UI (Next.js) ──HTTPS──▶ Backend API (FastAPI) ──SQL──▶
 |---|---|---|---|
 | 1. บริหารเนื้อหา/จอรวมศูนย์ผ่านเว็บ | Admin UI 13 หน้า + 63 API | `test_content_pipeline.py` | ✅ ผ่าน |
 | 2. ผังการเล่น + ตารางเวลาตามกลุ่มจอ | Plan/Schedule + RRULE + manifest | `test_phase5_rest.py` | ✅ ผ่าน |
-| 3. ควบคุมทีวี CEC/RS-232 | 7 โปรโตคอล + 12 คำสั่ง | `test_tv_control.py` (15) | ✅ ผ่าน |
+| 3. ควบคุมทีวี CEC/RS-232 | 7 ยี่ห้อ + 11 คำสั่ง | `test_tv_control.py` (15) | ✅ ผ่าน |
 | 4. ประกาศฉุกเฉินแทรกทับทันที | Emergency override + auto-expire | `test_audit_emergency.py` | ✅ ผ่าน |
 | 5. สิทธิ์ + อนุมัติ + Audit | RBAC 7 บทบาท + approval + audit log | `test_auth.py` (15) | ✅ ผ่าน |
 
@@ -437,9 +462,17 @@ open http://localhost:9001                     # MinIO console (minioadmin/minio
 ```
 ใส่ข้อมูล demo: `docker compose exec backend python -m app.scripts.seed_demo`
 
-### ภาคผนวก ข — บัญชีทดสอบ (จาก seed_demo)
-- `admin / ChangeMe123!` (super_admin)
-- `editor1`, `approver1`, `operator1` (สำหรับทดสอบ RBAC)
+### ภาคผนวก ข — บัญชีทดสอบ + ข้อมูล demo (จาก seed)
+**บัญชีผู้ใช้:**
+| username | password | บทบาท |
+|---|---|---|
+| `admin` | `ChangeMe123!` | super_admin (จาก seed แรก — เปลี่ยนทันทีหลัง login) |
+| `editor1` | `editor123` | editor |
+| `approver1` | `approver123` | approver |
+| `operator1` | `operator123` | operator |
+
+**ข้อมูลตัวอย่างที่ `seed_demo` สร้างให้ (เห็น flow ทันที):** 3 จอ (จอลอบบี้ / โรงอาหาร / ห้องประชุม พร้อม pairing code) · 1 กลุ่มจอ ("ทุกจอใน demo") · 2 เนื้อหา URL (อนุมัติแล้ว) · 1 presentation (fullscreen) · 1 plan · 1 schedule (active 7 วัน)
+> ⚠ ห้ามรันบน production — รหัสผ่าน demo เดาง่าย
 
 ### ภาคผนวก ค — ตัวแปรสภาพแวดล้อมสำคัญ (`.env.example`)
 | ตัวแปร | ความหมาย |
@@ -497,6 +530,7 @@ open http://localhost:9001                     # MinIO console (minioadmin/minio
 - ☐ ตารางที่ 9 — แผนการดำเนินงานรายสัปดาห์ (ข้อ 1.7)
 - ☐ ตารางที่ 10 — การประเมินความครบถ้วนของฟังก์ชัน (ข้อ 7.4.1)
 - ☐ ตารางที่ 11 — ตัวชี้วัดเชิงปริมาณที่ควรวัด (ข้อ 7.4.4)
+- ☐ ตารางที่ 12 — ค่าพารามิเตอร์/นโยบายของระบบ (ข้อ 6.8)
 
 ---
 
