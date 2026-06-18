@@ -68,14 +68,17 @@ Ok "pytest passed"
 
 # ---------- 5. smoke ----------
 Step "[5/6] smoke_e2e.py (Phase 0-6)"
+$env:PYTHONUTF8 = "1"   # กัน UnicodeEncodeError บน Windows cp1252 console (smoke print ✓/→/emoji)
 
 $py = $null
 foreach ($c in @("python", "py", "python3")) {
     if (Get-Command $c -ErrorAction SilentlyContinue) { $py = $c; break }
 }
 if (-not $py) {
-    Err "ไม่พบ python — รัน smoke ผ่าน container แทน"
-    & docker compose exec -T backend python /scripts/smoke_e2e.py
+    # compose mount แค่ ./backend:/app ไม่ได้ mount scripts/ → exec path /scripts/... ไม่มีจริง
+    # จึง pipe สคริปต์เข้า stdin ของ python ในคอนเทนเนอร์ (smoke ใช้ stdlib ล้วน รันได้เลย)
+    Err "ไม่พบ host python — pipe smoke_e2e.py เข้า container backend แทน"
+    Get-Content "scripts/smoke_e2e.py" -Raw | & docker compose exec -T backend python - "http://localhost:8000"
 } else {
     & $py "scripts/smoke_e2e.py"
 }

@@ -24,6 +24,13 @@ import urllib.request
 import urllib.error
 import urllib.parse
 
+# Windows console (cp1252) encode อักขระ ✓/→/emoji ไม่ได้ → บังคับ stdout เป็น UTF-8
+# (กัน UnicodeEncodeError ตั้งแต่ print บรรทัดแรกก่อนเช็คใดๆ บน terminal มาตรฐานของ Windows)
+try:
+    sys.stdout.reconfigure(encoding="utf-8")
+except Exception:
+    pass
+
 
 BASE_URL = sys.argv[1] if len(sys.argv) > 1 else "http://localhost:8000"
 ADMIN_USER = os.getenv("ADMIN_USERNAME", "admin")
