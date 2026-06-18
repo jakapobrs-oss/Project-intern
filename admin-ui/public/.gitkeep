@@ -1,0 +1,3 @@
+# Next.js static assets directory
+# ไฟล์ static ที่เสิร์ฟตรง (favicon, robots.txt ฯลฯ)
+# จำเป็นต้องมีเพื่อให้ Dockerfile.prod (COPY /app/public) build ผ่าน
