@@ -11,6 +11,7 @@ from app.models.audit import AuditLog, AuditOutcome  # noqa: F401
 from app.models.emergency import (  # noqa: F401
     EmergencyBroadcast, EmergencyKind, EmergencyStatus,
 )
+from app.models.playback import PlaybackLog  # noqa: F401
 
 __all__ = [
     "User", "Role",
@@ -21,4 +22,5 @@ __all__ = [
     "Schedule", "ScheduleStatus",
     "AuditLog", "AuditOutcome",
     "EmergencyBroadcast", "EmergencyKind", "EmergencyStatus",
+    "PlaybackLog",
 ]

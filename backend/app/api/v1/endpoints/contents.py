@@ -8,6 +8,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.v1.deps import get_current_user, require_role
+from app.core import queue, url_guard
 from app.db import get_db
 from app.models.content import Content, ApprovalStatus, ContentType
 from app.models.user import User, Role
@@ -53,6 +54,13 @@ async def upload_content(
         )
     except ContentServiceError as e:
         raise HTTPException(status_code=400, detail={"code": e.code, "message": e.message})
+
+    # โยนงานหนักเข้า background (best-effort — ถ้า Redis ล่ม upload ยังสำเร็จ)
+    # เช็ค thumbnail_key == None เพื่อกัน re-process กรณี dedupe คืน content เดิม (§22)
+    if content.type in (ContentType.IMAGE, ContentType.VIDEO) and content.thumbnail_key is None:
+        await queue.enqueue("generate_thumbnail", str(content.id))
+        if content.type == ContentType.VIDEO:
+            await queue.enqueue("transcode_video", str(content.id))
     return content
 
 
@@ -65,6 +73,11 @@ async def create_url_content(
     """สร้าง content แบบ web/stream URL (ไม่อัปโหลดไฟล์)"""
     if payload.type not in (ContentType.WEB, ContentType.STREAM):
         raise HTTPException(400, "URL content ต้องเป็นชนิด web หรือ stream")
+    # SSRF guard (§26) — กัน URL ชี้เข้า network ภายใน
+    try:
+        url_guard.validate_public_url(str(payload.url))
+    except url_guard.UnsafeUrlError as e:
+        raise HTTPException(status_code=400, detail={"code": "UNSAFE_URL", "message": e.message})
     content = Content(
         name=payload.name,
         description=payload.description,

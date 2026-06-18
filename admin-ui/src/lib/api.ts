@@ -247,7 +247,19 @@ export const api = {
     });
     if (!res.ok) {
       const body = await res.json().catch(() => ({}));
-      throw new ApiError(res.status, `HTTP_${res.status}`, body.detail || "Login failed");
+      // detail อาจเป็น string หรือ object {code, message} — ดึงข้อความให้ตรงรูปแบบเหมือน parser หลัก
+      // กันบั๊ก message เป็น "[object Object]" เมื่อ detail เป็น object
+      const detail = (body as { detail?: unknown }).detail;
+      let errMsg = "Login failed";
+      let errCode = `HTTP_${res.status}`;
+      if (typeof detail === "string") {
+        errMsg = detail;
+      } else if (detail && typeof detail === "object") {
+        const dd = detail as { code?: string; message?: string };
+        if (dd.message) errMsg = dd.message;
+        if (dd.code) errCode = dd.code;
+      }
+      throw new ApiError(res.status, errCode, errMsg, detail);
     }
     const data = (await res.json()) as {
       access_token: string;

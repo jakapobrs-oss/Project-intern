@@ -187,3 +187,44 @@ async def player_ack_command(
     ok = await tv_queue.ack_command(device.id, cmd_id, payload.success, payload.error)
     if not ok:
         raise HTTPException(404, "ไม่พบ command นี้ใน inflight ของ device นี้")
+
+
+# ===== Playback logging (§28 reporting) =====
+
+from datetime import datetime, timezone  # noqa: E402
+import uuid as _uuid  # noqa: E402
+from pydantic import BaseModel  # noqa: E402
+from app.models.playback import PlaybackLog  # noqa: E402
+
+
+class PlaybackEventIn(BaseModel):
+    content_id: _uuid.UUID | None = None
+    presentation_id: _uuid.UUID | None = None
+    played_at: datetime | None = None      # player ส่งเวลาจริง; ถ้าไม่ส่งใช้เวลา server
+    duration_sec: float | None = None
+
+
+class PlaybackBatchIn(BaseModel):
+    events: list[PlaybackEventIn]
+
+
+@router.post("/playback", status_code=204)
+async def player_report_playback(
+    payload: PlaybackBatchIn,
+    db: AsyncSession = Depends(get_db),
+    device: Device = Depends(get_player),
+):
+    """
+    Player รายงาน batch ของ playback events (content ไหนเล่นเมื่อไหร่)
+    → INSERT playback_logs สำหรับทำ play-count report (§28)
+    """
+    now = datetime.now(timezone.utc)
+    for ev in payload.events:
+        db.add(PlaybackLog(
+            device_id=device.id,
+            content_id=ev.content_id,
+            presentation_id=ev.presentation_id,
+            played_at=ev.played_at or now,
+            duration_sec=ev.duration_sec,
+        ))
+    await db.commit()

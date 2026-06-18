@@ -12,7 +12,7 @@ from app.db import get_db
 from app.models.schedule import Schedule, ScheduleStatus
 from app.models.user import User, Role
 from app.schemas.plan import ScheduleCreate, ScheduleUpdate, ScheduleOut
-from app.services import audit_service
+from app.services import audit_service, schedule_eval
 
 
 router = APIRouter()
@@ -28,16 +28,32 @@ async def list_schedules(db: AsyncSession = Depends(get_db), _: User = Depends(_
     return res.scalars().all()
 
 
+async def _detect_conflicts(db: AsyncSession, candidate: Schedule) -> list[Schedule]:
+    """หา schedule ที่ชนกัน (group เดียวกัน + ช่วงเวลาซ้อน + priority เท่ากัน, §23)"""
+    res = await db.execute(
+        select(Schedule).where(
+            Schedule.player_group_id == candidate.player_group_id,
+            Schedule.status.in_([ScheduleStatus.ACTIVE, ScheduleStatus.PENDING_APPROVAL]),
+            Schedule.is_active.is_(True),
+        )
+    )
+    return schedule_eval.find_conflicts(candidate, list(res.scalars().all()))
+
+
 @router.post("", response_model=ScheduleOut, status_code=201)
 async def create_schedule(
     payload: ScheduleCreate,
     db: AsyncSession = Depends(get_db),
     user: User = Depends(_can_edit),
+    force: bool = False,
 ):
     """
     Editor บันทึก → status = pending_approval (รอ approver)
     Admin บันทึก → status = active เลย
     (ดู §21)
+
+    §23 conflict guard: ถ้ามี schedule บน group เดียวกัน ช่วงเวลาซ้อน + priority เท่ากัน
+    → ปฏิเสธด้วย 409 (ยกเว้นส่ง ?force=true เพื่อยืนยันบันทึกทับ)
     """
     status = ScheduleStatus.ACTIVE if user.role in (Role.SUPER_ADMIN, Role.ADMIN) else ScheduleStatus.PENDING_APPROVAL
     sch = Schedule(
@@ -45,6 +61,17 @@ async def create_schedule(
         status=status,
         created_by=user.id,
     )
+    if not force:
+        conflicts = await _detect_conflicts(db, sch)
+        if conflicts:
+            raise HTTPException(
+                status_code=409,
+                detail={
+                    "code": "SCHEDULE_CONFLICT",
+                    "message": "มี schedule ที่ priority เท่ากันและช่วงเวลาซ้อนกันบน group นี้ — ส่ง ?force=true เพื่อบันทึกทับ",
+                    "conflicts": [{"id": str(c.id), "name": c.name, "priority": c.priority} for c in conflicts],
+                },
+            )
     if status == ScheduleStatus.ACTIVE:
         sch.approved_by = user.id
         sch.approved_at = datetime.now(timezone.utc)

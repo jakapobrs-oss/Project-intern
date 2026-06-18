@@ -50,7 +50,12 @@ async def claim_pairing(
         raise DeviceServiceError("INVALID_CODE", "pairing code ไม่ถูกต้อง")
 
     now = datetime.now(timezone.utc)
-    if device.pairing_code_expires_at and device.pairing_code_expires_at < now:
+    expires_at = device.pairing_code_expires_at
+    # SQLite (test) อ่าน DateTime กลับมาเป็น naive — coerce เป็น aware (UTC) ก่อนเทียบ
+    # กัน TypeError: can't compare offset-naive and offset-aware datetimes
+    if expires_at is not None and expires_at.tzinfo is None:
+        expires_at = expires_at.replace(tzinfo=timezone.utc)
+    if expires_at and expires_at < now:
         raise DeviceServiceError("CODE_EXPIRED", "pairing code หมดอายุแล้ว")
 
     # ออก device token (raw + hash)

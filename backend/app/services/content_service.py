@@ -10,6 +10,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.storage import upload_fileobj, sha256_stream, ensure_bucket
+from app.core import antivirus
 from app.models.content import Content, ContentType
 
 
@@ -98,6 +99,15 @@ async def upload_content_file(
             "FILE_TOO_LARGE",
             f"ไฟล์ขนาด {size} เกินขีดจำกัด {limit} bytes สำหรับ {ctype.value}",
         )
+
+    # 4.5 virus scan (§22) — no-op ถ้า CLAMAV_ENABLED=false
+    file.seek(0)
+    try:
+        antivirus.scan_fileobj(file)
+    except antivirus.VirusFoundError as e:
+        raise ContentServiceError("INFECTED", f"ไฟล์ติดไวรัส: {e.signature}")
+    except antivirus.ScanUnavailableError as e:
+        raise ContentServiceError("SCAN_UNAVAILABLE", str(e))
 
     # 5. upload
     file.seek(0)

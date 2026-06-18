@@ -61,6 +61,12 @@ class Settings(BaseSettings):
     # ตอนนี้ frontend ใช้ JWT-in-localStorage → CSRF ไม่ใช่ปัญหา (ปิดโดย default)
     csrf_enabled: bool = False
 
+    # ===== ClamAV virus scan (§22) — env-gated, ปิดใน dev =====
+    clamav_enabled: bool = False
+    clamav_host: str = "clamav"
+    clamav_port: int = 3310
+    clamav_fail_closed: bool = True   # ต่อ clamd ไม่ได้ → ปฏิเสธ upload (ปลอดภัยกว่า)
+
     @property
     def cors_origins_list(self) -> list[str]:
         """แปลง CORS_ORIGINS จาก string คั่นด้วย comma เป็น list"""

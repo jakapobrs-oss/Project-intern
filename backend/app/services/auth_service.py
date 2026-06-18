@@ -2,6 +2,7 @@
 Auth service — business logic ของ login / refresh / account lockout
 แยกออกจาก endpoint เพื่อ test ง่าย + reuse ได้
 """
+import uuid
 from datetime import datetime, timezone
 from sqlalchemy import or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -95,7 +96,14 @@ async def refresh_tokens(db: AsyncSession, refresh_token: str) -> tuple[User, st
     if not user_id:
         raise AuthError("INVALID_TOKEN", "refresh token ไม่มี subject")
 
-    user = await db.get(User, user_id)
+    # JWT sub เป็น string — แปลงเป็น UUID ก่อน query (SQLAlchemy Uuid type ต้องการ UUID object)
+    # ให้สอดคล้องกับ get_current_user (deps.py) ที่แปลงเหมือนกัน
+    try:
+        user_pk = uuid.UUID(str(user_id))
+    except (ValueError, TypeError) as e:
+        raise AuthError("INVALID_TOKEN", "refresh token subject ไม่ถูกต้อง") from e
+
+    user = await db.get(User, user_pk)
     if user is None or not user.is_active or user.is_locked:
         raise AuthError("INVALID_TOKEN", "user ไม่พร้อมใช้งาน")
 

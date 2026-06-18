@@ -38,3 +38,13 @@ from app.api.v1.endpoints import emergency, monitoring  # noqa: E402
 
 api_router.include_router(emergency.router, prefix="/emergency", tags=["emergency"])
 api_router.include_router(monitoring.router, tags=["monitoring"])
+
+# §28 — Reporting & Analytics
+from app.api.v1.endpoints import reports  # noqa: E402
+
+api_router.include_router(reports.router, prefix="/reports", tags=["reports"])
+
+# LED board control (scope บรีฟข้อ 2)
+from app.api.v1.endpoints import led  # noqa: E402
+
+api_router.include_router(led.router, prefix="/led", tags=["led"])

@@ -3,6 +3,7 @@ fastapi==0.115.5
 uvicorn[standard]==0.32.1
 pydantic==2.10.3
 pydantic-settings==2.7.0
+email-validator==2.3.0         # จำเป็นสำหรับ Pydantic EmailStr (User schema) — เดิมตกหล่นใน requirements
 
 # ===== Database =====
 sqlalchemy[asyncio]==2.0.36
@@ -16,6 +17,7 @@ arq==0.26.3
 # ===== Auth / Security =====
 python-jose[cryptography]==3.3.0
 passlib[bcrypt]==1.7.4
+bcrypt==4.2.1                  # pin! passlib 1.7.4 พังกับ bcrypt 5.x (ValueError >72 bytes ตอน init)
 python-multipart==0.0.18
 
 # ===== Object storage =====
@@ -29,8 +31,14 @@ Pillow==11.0.0
 # ===== Utility =====
 httpx==0.28.1
 python-dotenv==1.0.1
+python-dateutil==2.9.0.post0   # parse RRULE สำหรับ scheduler (§23)
+tzdata==2024.2                 # IANA timezone db (จำเป็นบน Windows/slim container — zoneinfo)
 loguru==0.7.3
 tenacity==9.0.0
+
+# ===== Reporting / export (§28) =====
+openpyxl==3.1.5                 # export Excel report
+reportlab==4.2.5               # export PDF report (pure-python, ไม่ต้อง system lib)
 
 # ===== Observability (optional — Sentry) =====
 # ใส่ comment ถ้าไม่ใช้ — ระบบยังทำงานปกติ (ดู app/core/sentry.py)

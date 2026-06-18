@@ -17,6 +17,7 @@ from sqlalchemy.orm import selectinload
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.storage import presigned_get_url
+from app.services import schedule_eval
 from app.models.device import Device
 from app.models.schedule import Schedule, ScheduleStatus
 from app.models.plan import Plan
@@ -49,8 +50,11 @@ async def _device_schedules(db: AsyncSession, device: Device) -> list[Schedule]:
     )
     res = await db.execute(stmt)
     schedules = list(res.scalars().all())
-    # filter: ยังไม่หมดอายุ
-    return [s for s in schedules if (s.end_at is None or s.end_at >= now)]
+    # filter (§23): เช็ค date-range + RRULE + daily window + วันในสัปดาห์ ตาม timezone ของ device
+    # is_active_now() coerce datetime เป็น aware เองแล้ว (ปลอดภัยทั้ง SQLite/Postgres)
+    # device อาจไม่มี field timezone → fallback ไป settings.app_timezone ใน schedule_eval
+    device_tz = getattr(device, "timezone", None)
+    return schedule_eval.filter_active(schedules, now=now, device_tz=device_tz)
 
 
 def _content_url(content: Content) -> str | None:

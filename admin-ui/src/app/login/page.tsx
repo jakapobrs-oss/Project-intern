@@ -47,10 +47,14 @@ export default function LoginPage() {
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="mb-1 block text-sm font-medium text-slate-700 dark:text-slate-300">
+              <label
+                htmlFor="username"
+                className="mb-1 block text-sm font-medium text-slate-700 dark:text-slate-300"
+              >
                 ชื่อผู้ใช้
               </label>
               <Input
+                id="username"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
                 required
@@ -59,10 +63,14 @@ export default function LoginPage() {
               />
             </div>
             <div>
-              <label className="mb-1 block text-sm font-medium text-slate-700 dark:text-slate-300">
+              <label
+                htmlFor="password"
+                className="mb-1 block text-sm font-medium text-slate-700 dark:text-slate-300"
+              >
                 รหัสผ่าน
               </label>
               <Input
+                id="password"
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}

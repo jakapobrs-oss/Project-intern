@@ -16,6 +16,18 @@ from app.core.security import hash_password
 from app.models.user import User, Role
 
 
+@pytest.fixture(autouse=True)
+def _fresh_middleware_stack():
+    """
+    Reset middleware stack ก่อนทุก test → rate-limit bucket (in-memory) เริ่มใหม่
+    กัน test-isolation: ทุก test ใช้ client IP เดียวกัน ถ้า bucket สะสมข้าม test
+    login หลายครั้งจะโดน 429 (ทำให้ KeyError: access_token ใน test อื่น)
+    setting middleware_stack=None → Starlette rebuild พร้อม bucket ว่างตอน request แรก
+    """
+    app.middleware_stack = None
+    yield
+
+
 @pytest_asyncio.fixture
 async def db_engine():
     """SQLite in-memory engine ต่อ 1 test"""
@@ -58,7 +70,7 @@ async def super_admin(db_session) -> User:
     """User super_admin สำหรับ test (password: 'testpass123')"""
     user = User(
         username="superadmin",
-        email="super@test.local",
+        email="superadmin@example.com",
         full_name="Test Super Admin",
         role=Role.SUPER_ADMIN,
         is_active=True,
@@ -75,7 +87,7 @@ async def viewer_user(db_session) -> User:
     """User viewer สำหรับทดสอบ RBAC denial (password: 'testpass123')"""
     user = User(
         username="viewer1",
-        email="viewer@test.local",
+        email="viewer1@example.com",
         full_name="Test Viewer",
         role=Role.VIEWER,
         is_active=True,

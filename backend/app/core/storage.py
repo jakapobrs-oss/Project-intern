@@ -54,6 +54,19 @@ def delete_object(key: str, bucket: str | None = None) -> None:
     get_s3_client().delete_object(Bucket=bucket, Key=key)
 
 
+def download_to_path(key: str, dest_path: str, bucket: str | None = None) -> None:
+    """ดาวน์โหลด object จาก S3 ลงไฟล์ใน local (ใช้ใน worker transcode/thumbnail)"""
+    bucket = bucket or settings.s3_bucket
+    get_s3_client().download_file(bucket, key, dest_path)
+
+
+def upload_path(local_path: str, key: str, content_type: str | None = None, bucket: str | None = None) -> None:
+    """อัปโหลดไฟล์จาก local path ขึ้น S3 (ใช้หลัง worker สร้าง thumbnail/transcoded เสร็จ)"""
+    bucket = bucket or settings.s3_bucket
+    extra = {"ContentType": content_type} if content_type else {}
+    get_s3_client().upload_file(local_path, bucket, key, ExtraArgs=extra)
+
+
 def presigned_get_url(key: str, expires_in: int = 3600, bucket: str | None = None) -> str:
     """สร้าง pre-signed URL ให้ player ใช้ download (§22 signed URL)"""
     bucket = bucket or settings.s3_bucket

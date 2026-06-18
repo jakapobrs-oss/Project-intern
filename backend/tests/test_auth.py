@@ -169,7 +169,7 @@ async def test_super_admin_create_user(client: AsyncClient, super_admin: User):
         headers={"Authorization": f"Bearer {access}"},
         json={
             "username": "newuser",
-            "email": "new@test.local",
+            "email": "new@example.com",
             "password": "Newpass123",
             "role": "editor",
             "full_name": "New User",
@@ -195,7 +195,7 @@ async def test_create_user_duplicate(client: AsyncClient, super_admin: User):
         headers={"Authorization": f"Bearer {access}"},
         json={
             "username": super_admin.username,  # ซ้ำ
-            "email": "different@test.local",
+            "email": "different@example.com",
             "password": "Pass1234",
             "role": "viewer",
         },
