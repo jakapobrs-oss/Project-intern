@@ -1,5 +1,6 @@
 """Pydantic schemas — TV control"""
 import uuid
+
 from pydantic import BaseModel, Field
 
 from app.services.tv_control.base import TVBrand, TVCommandType

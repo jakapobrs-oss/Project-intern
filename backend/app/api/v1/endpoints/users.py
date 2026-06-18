@@ -2,6 +2,7 @@
 User CRUD endpoints — เฉพาะ SUPER_ADMIN (ดู §21)
 """
 import uuid
+
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
@@ -10,9 +11,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.api.v1.deps import require_role
 from app.core.security import hash_password
 from app.db import get_db
-from app.models.user import User, Role
-from app.schemas.user import UserCreate, UserUpdate, UserOut
-
+from app.models.user import Role, User
+from app.schemas.user import UserCreate, UserOut, UserUpdate
 
 router = APIRouter()
 
@@ -51,7 +51,7 @@ async def create_user(
         await db.commit()
     except IntegrityError:
         await db.rollback()
-        raise HTTPException(status_code=409, detail="username หรือ email ซ้ำ")
+        raise HTTPException(status_code=409, detail="username หรือ email ซ้ำ") from None
     await db.refresh(user)
     return user
 
@@ -92,7 +92,7 @@ async def update_user(
         await db.commit()
     except IntegrityError:
         await db.rollback()
-        raise HTTPException(status_code=409, detail="email ซ้ำกับ user อื่น")
+        raise HTTPException(status_code=409, detail="email ซ้ำกับ user อื่น") from None
     await db.refresh(user)
     return user
 

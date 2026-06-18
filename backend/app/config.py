@@ -3,6 +3,7 @@
 ไฟล์เดียวเป็น single source of truth สำหรับ config ทั้ง backend
 """
 from functools import lru_cache
+
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 

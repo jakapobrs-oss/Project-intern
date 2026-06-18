@@ -11,22 +11,26 @@ Flow:
 import hashlib
 import json
 import uuid
-from datetime import datetime, timezone
+from datetime import UTC, datetime
+
 from sqlalchemy import select
-from sqlalchemy.orm import selectinload
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
 
 from app.core.storage import presigned_get_url
+from app.models.content import Content, ContentType
 from app.models.device import Device
-from app.models.schedule import Schedule, ScheduleStatus
+from app.models.emergency import EmergencyBroadcast, EmergencyStatus
 from app.models.plan import Plan
 from app.models.presentation import Presentation
-from app.models.content import Content, ContentType
-from app.models.emergency import EmergencyBroadcast, EmergencyStatus
+from app.models.schedule import Schedule, ScheduleStatus
 from app.schemas.manifest import (
-    Manifest, ManifestItem, ManifestZone, ManifestSchedule, ManifestEmergency,
+    Manifest,
+    ManifestEmergency,
+    ManifestItem,
+    ManifestSchedule,
+    ManifestZone,
 )
-
 
 PRESIGNED_TTL = 3600  # 1 ชม. — player จะ poll manifest ใหม่ก่อน URL หมด
 
@@ -36,7 +40,7 @@ async def _device_schedules(db: AsyncSession, device: Device) -> list[Schedule]:
     group_ids = [g.id for g in device.groups]
     if not group_ids:
         return []
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
     stmt = (
         select(Schedule)
         .where(
@@ -132,7 +136,7 @@ async def _active_emergencies_for(db: AsyncSession, device: Device) -> list[Emer
       - starts_at NULL หรือ <= now
       - ends_at   NULL หรือ >= now
     """
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
     stmt = (
         select(EmergencyBroadcast)
         .where(EmergencyBroadcast.status == EmergencyStatus.ACTIVE)
@@ -190,7 +194,7 @@ async def build_manifest(db: AsyncSession, device: Device) -> Manifest:
     plan_name_by_id: dict[uuid.UUID, str] = {}
     if plan_ids:
         res = await db.execute(select(Plan.id, Plan.name).where(Plan.id.in_(plan_ids)))
-        plan_name_by_id = {pid: name for pid, name in res.all()}
+        plan_name_by_id = dict(res.all())
 
     schedule_payload = [
         ManifestSchedule(
@@ -235,7 +239,7 @@ async def build_manifest(db: AsyncSession, device: Device) -> Manifest:
         version=version,
         device_id=device.id,
         device_name=device.name,
-        server_time=datetime.now(timezone.utc),
+        server_time=datetime.now(UTC),
         cache_seconds=60,
         schedules=schedule_payload,
         items=items,

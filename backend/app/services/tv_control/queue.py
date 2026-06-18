@@ -9,13 +9,12 @@ Key format:
 """
 import json
 import uuid
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from typing import Any
 
 import redis.asyncio as aioredis
 
 from app.config import settings
-
 
 _redis: aioredis.Redis | None = None
 
@@ -48,7 +47,7 @@ async def enqueue_command(device_id: uuid.UUID, command: dict[str, Any]) -> str:
     """
     r = get_redis()
     cmd_id = uuid.uuid4().hex
-    now = datetime.now(timezone.utc).isoformat()
+    now = datetime.now(UTC).isoformat()
 
     record = {
         **command,
@@ -98,7 +97,7 @@ async def ack_command(device_id: uuid.UUID, cmd_id: str, success: bool, error: s
     await r.srem(_inflight_key(device_id), cmd_id)
     mapping = {
         "status": "success" if success else "failed",
-        "completed_at": datetime.now(timezone.utc).isoformat(),
+        "completed_at": datetime.now(UTC).isoformat(),
     }
     if error:
         mapping["error"] = error

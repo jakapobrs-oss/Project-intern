@@ -1,10 +1,10 @@
 """Pydantic schemas — device + player group"""
 import uuid
 from datetime import datetime
-from pydantic import BaseModel, Field, ConfigDict
 
-from app.models.device import DeviceStatus, DevicePlatform
+from pydantic import BaseModel, ConfigDict, Field
 
+from app.models.device import DevicePlatform, DeviceStatus
 
 # ===== Device =====
 

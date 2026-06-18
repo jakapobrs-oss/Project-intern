@@ -3,7 +3,7 @@ Smoke test ของ Phase 0 — เช็คว่า app start ได้แล
 รันด้วย: pytest backend/tests/ -v
 """
 import pytest
-from httpx import AsyncClient, ASGITransport
+from httpx import ASGITransport, AsyncClient
 
 from app.main import app
 

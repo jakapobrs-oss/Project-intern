@@ -10,11 +10,12 @@ Output format:
     <metric_name>{<label>="<value>"} <number>
 """
 from __future__ import annotations
-from sqlalchemy import select, func
+
+from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.models.content import ApprovalStatus, Content
 from app.models.device import Device, DeviceStatus
-from app.models.content import Content, ApprovalStatus
 from app.models.emergency import EmergencyBroadcast, EmergencyStatus
 
 

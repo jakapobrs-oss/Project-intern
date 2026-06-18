@@ -4,7 +4,9 @@ User model + RoleEnum (RBAC 7 roles ตาม PLAN.md §21)
 import enum
 import uuid
 from datetime import datetime
-from sqlalchemy import String, Boolean, DateTime, Enum as SAEnum, Integer, Uuid, func
+
+from sqlalchemy import Boolean, DateTime, Integer, String, Uuid, func
+from sqlalchemy import Enum as SAEnum
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.db import Base

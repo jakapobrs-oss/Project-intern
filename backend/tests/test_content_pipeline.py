@@ -2,8 +2,8 @@
 ทดสอบ content pipeline — magic bytes detection (ไม่แตะ S3)
 ทดสอบ S3 upload ใน integration test (Phase ถัดไป)
 """
-from app.services.content_service import detect_mime_from_magic
 from app.models.content import ContentType
+from app.services.content_service import detect_mime_from_magic
 
 
 def test_detect_jpeg():

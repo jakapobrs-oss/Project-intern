@@ -4,25 +4,25 @@ Emergency Broadcast endpoints (Phase 5, §8.5 Top-5 optional)
 - editor/viewer ดูได้อย่างเดียว
 - player API จะใช้ presigned manifest ดึง active broadcast (Phase 5 manifest-integration)
 """
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from uuid import UUID
+
 from fastapi import APIRouter, Depends, HTTPException, Request, status
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.v1.deps import get_current_user, require_role
 from app.db import get_db
-from app.models.user import User, Role
 from app.models.emergency import EmergencyBroadcast, EmergencyStatus
-from app.schemas.emergency import EmergencyCreate, EmergencyUpdate, EmergencyOut
+from app.models.user import Role, User
+from app.schemas.emergency import EmergencyCreate, EmergencyOut, EmergencyUpdate
 from app.services import audit_service
-from app.models.audit import AuditOutcome
-
 
 router = APIRouter()
 
 
 MUTATE_ROLES = (Role.SUPER_ADMIN, Role.ADMIN, Role.OPERATOR)
+_can_mutate = require_role(*MUTATE_ROLES)
 
 
 @router.get("/", response_model=list[EmergencyOut])
@@ -43,7 +43,7 @@ async def list_broadcasts(
 async def create_broadcast(
     body: EmergencyCreate,
     request: Request,
-    user: User = Depends(require_role(*MUTATE_ROLES)),
+    user: User = Depends(_can_mutate),
     db: AsyncSession = Depends(get_db),
 ):
     row = EmergencyBroadcast(
@@ -80,7 +80,7 @@ async def create_broadcast(
 async def update_broadcast(
     bid: UUID,
     body: EmergencyUpdate,
-    user: User = Depends(require_role(*MUTATE_ROLES)),
+    user: User = Depends(_can_mutate),
     db: AsyncSession = Depends(get_db),
 ):
     row = await db.get(EmergencyBroadcast, bid)
@@ -104,7 +104,7 @@ async def update_broadcast(
 async def activate_broadcast(
     bid: UUID,
     request: Request,
-    user: User = Depends(require_role(*MUTATE_ROLES)),
+    user: User = Depends(_can_mutate),
     db: AsyncSession = Depends(get_db),
 ):
     """activate broadcast — เปลี่ยน status เป็น ACTIVE + set acknowledged_at"""
@@ -114,7 +114,7 @@ async def activate_broadcast(
     if row.status != EmergencyStatus.DRAFT:
         raise HTTPException(409, f"broadcast อยู่สถานะ {row.status.value} แล้ว")
 
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
     row.status = EmergencyStatus.ACTIVE
     row.acknowledged_at = now
     if row.starts_at is None:
@@ -144,7 +144,7 @@ async def activate_broadcast(
 async def cancel_broadcast(
     bid: UUID,
     request: Request,
-    user: User = Depends(require_role(*MUTATE_ROLES)),
+    user: User = Depends(_can_mutate),
     db: AsyncSession = Depends(get_db),
 ):
     row = await db.get(EmergencyBroadcast, bid)
@@ -154,7 +154,7 @@ async def cancel_broadcast(
         raise HTTPException(409, f"broadcast อยู่สถานะ {row.status.value} แล้ว")
 
     row.status = EmergencyStatus.CANCELLED
-    row.ends_at = datetime.now(timezone.utc)
+    row.ends_at = datetime.now(UTC)
     await db.commit()
     await db.refresh(row)
 

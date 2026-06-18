@@ -22,11 +22,10 @@ from app.config import settings
 from app.db import get_db
 from app.models.audit import AuditOutcome
 from app.models.user import User
-from app.schemas.auth import TokenPair, RefreshRequest
+from app.schemas.auth import RefreshRequest, TokenPair
 from app.schemas.user import UserOut
-from app.services import auth_service, audit_service
+from app.services import audit_service, auth_service
 from app.services.auth_service import AuthError
-
 
 router = APIRouter()
 
@@ -121,7 +120,7 @@ async def login(
             message=e.code,
             **ctx,
         )
-        raise _auth_error_to_http(e)
+        raise _auth_error_to_http(e) from e
 
     access, refresh = auth_service.issue_token_pair(user)
     await audit_service.log_event(
@@ -175,7 +174,7 @@ async def refresh(
     try:
         _, access, new_refresh = await auth_service.refresh_tokens(db, refresh_token)
     except AuthError as e:
-        raise _auth_error_to_http(e)
+        raise _auth_error_to_http(e) from e
 
     # rotate cookies ด้วย (cookie mode)
     _set_auth_cookies(response, access, new_refresh)

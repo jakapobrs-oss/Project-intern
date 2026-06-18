@@ -3,7 +3,6 @@ Phase 7 tests — security headers + rate limit middleware
 """
 import pytest
 
-
 # ─── Security headers ───────────────────────────────────────────────
 
 @pytest.mark.asyncio
@@ -53,7 +52,6 @@ async def test_login_rate_limit_blocks_after_max_requests(client):
     assert 429 in last_5, f"expected 429 in last 5, got {last_5}"
 
     # ตอนที่ blocked → ต้องมี Retry-After + body code=RATE_LIMITED
-    blocked_idx = next(i for i, s in enumerate(statuses) if s == 429)
     res = await client.post(
         "/api/v1/auth/login",
         data={"username": "x", "password": "x"},
@@ -99,8 +97,9 @@ async def test_memory_backend_check_and_record():
 @pytest.mark.asyncio
 async def test_redis_backend_fallback_when_no_client():
     """backend=redis แต่ redis_client=None → middleware ใช้ memory fallback"""
-    from app.core.middleware import RateLimitMiddleware
     from starlette.applications import Starlette
+
+    from app.core.middleware import RateLimitMiddleware
     starlette_app = Starlette()
     mw = RateLimitMiddleware(starlette_app, backend="redis", redis_client=None)
     # ตรวจว่า fallback ไป _MemoryBucket

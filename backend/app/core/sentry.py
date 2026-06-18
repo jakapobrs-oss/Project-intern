@@ -15,12 +15,13 @@ PII scrubbing (PDPA §31 compliance):
 ใช้: เรียก `init_sentry()` ครั้งเดียวใน lifespan startup
 """
 from __future__ import annotations
+
 import re
 from typing import Any
+
 from loguru import logger
 
 from app.config import settings
-
 
 _initialized = False
 
@@ -91,7 +92,7 @@ def _scrub_value(value: Any) -> Any:
     """recursive scrub — keep structure, redact values"""
     if isinstance(value, dict):
         return {k: (REDACTED if _is_sensitive_key(k) else _scrub_value(v)) for k, v in value.items()}
-    if isinstance(value, (list, tuple)):
+    if isinstance(value, list | tuple):
         return type(value)(_scrub_value(v) for v in value)
     if isinstance(value, str):
         # mask email + phone ใน message-level strings
@@ -190,8 +191,8 @@ def init_sentry() -> bool:
     try:
         import sentry_sdk
         from sentry_sdk.integrations.fastapi import FastApiIntegration
-        from sentry_sdk.integrations.starlette import StarletteIntegration
         from sentry_sdk.integrations.sqlalchemy import SqlalchemyIntegration
+        from sentry_sdk.integrations.starlette import StarletteIntegration
     except ImportError:
         logger.warning(
             "sentry: SENTRY_DSN ระบุไว้ แต่ไม่พบ package 'sentry-sdk' — "

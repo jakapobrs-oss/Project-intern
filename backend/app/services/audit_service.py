@@ -16,7 +16,10 @@ Audit service — เขียน AuditLog entries แบบ best-effort (ไม
 - rbac.denied
 """
 from __future__ import annotations
+
+import contextlib
 from typing import Any
+
 from loguru import logger
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -71,10 +74,8 @@ async def log_event(
         logger.warning(f"audit_service.log_event failed: {e}")
         # rollback ถ้าเรา autocommit เอง — ไม่ rollback caller's transaction
         if autocommit:
-            try:
+            with contextlib.suppress(Exception):
                 await db.rollback()
-            except Exception:  # noqa: BLE001
-                pass
         return None
 
 

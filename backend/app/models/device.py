@@ -6,12 +6,24 @@ Device + PlayerGroup model
 ดู PLAN §35.1 (Hierarchy 5-tier)
 """
 import enum
-import uuid
 import secrets
+import uuid
 from datetime import datetime
+
 from sqlalchemy import (
-    String, Boolean, DateTime, Enum as SAEnum, Integer,
-    ForeignKey, Table, Column, Uuid, func, Text,
+    Boolean,
+    Column,
+    DateTime,
+    ForeignKey,
+    Integer,
+    String,
+    Table,
+    Text,
+    Uuid,
+    func,
+)
+from sqlalchemy import (
+    Enum as SAEnum,
 )
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 

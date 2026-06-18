@@ -4,6 +4,7 @@ S3/MinIO storage helper — wrap boto3
 """
 import hashlib
 from typing import BinaryIO
+
 import boto3
 from botocore.client import Config
 from botocore.exceptions import ClientError

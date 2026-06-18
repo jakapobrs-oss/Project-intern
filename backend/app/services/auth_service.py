@@ -2,22 +2,21 @@
 Auth service — business logic ของ login / refresh / account lockout
 แยกออกจาก endpoint เพื่อ test ง่าย + reuse ได้
 """
-from datetime import datetime, timezone
+import uuid
+from datetime import UTC, datetime
+
 from sqlalchemy import or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.config import settings
 from app.core.security import (
-    hash_password,
-    verify_password,
+    JWTError,
+    TokenType,
     create_access_token,
     create_refresh_token,
     decode_token,
-    TokenType,
-    JWTError,
+    verify_password,
 )
 from app.models.user import User
-
 
 # §26: lockout หลัง fail 5 ครั้ง (ปลดเอง = admin reset หรือรอ unlock policy ใน Phase ถัดไป)
 MAX_FAILED_LOGIN = 5
@@ -65,7 +64,7 @@ async def authenticate(db: AsyncSession, username: str, password: str) -> User:
 
     # success → reset counter + บันทึก last_login
     user.failed_login_count = 0
-    user.last_login_at = datetime.now(timezone.utc)
+    user.last_login_at = datetime.now(UTC)
     await db.commit()
     await db.refresh(user)
     return user
@@ -95,7 +94,14 @@ async def refresh_tokens(db: AsyncSession, refresh_token: str) -> tuple[User, st
     if not user_id:
         raise AuthError("INVALID_TOKEN", "refresh token ไม่มี subject")
 
-    user = await db.get(User, user_id)
+    # JWT sub เป็น string — แปลงเป็น UUID object ก่อน (SQLAlchemy Uuid type ต้องการ UUID
+    # ไม่ใช่ str — เช่นเดียวกับ get_current_user ใน deps.py)
+    try:
+        user_pk = uuid.UUID(user_id)
+    except (ValueError, TypeError) as e:
+        raise AuthError("INVALID_TOKEN", "refresh token subject ไม่ถูกต้อง") from e
+
+    user = await db.get(User, user_pk)
     if user is None or not user.is_active or user.is_locked:
         raise AuthError("INVALID_TOKEN", "user ไม่พร้อมใช้งาน")
 

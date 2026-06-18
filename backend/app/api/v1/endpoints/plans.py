@@ -2,17 +2,17 @@
 Plan endpoints (= playlist)
 """
 import uuid
+
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import select
-from sqlalchemy.orm import selectinload
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
 
 from app.api.v1.deps import require_role
 from app.db import get_db
 from app.models.plan import Plan, PlanItem
-from app.models.user import User, Role
-from app.schemas.plan import PlanCreate, PlanUpdate, PlanOut
-
+from app.models.user import Role, User
+from app.schemas.plan import PlanCreate, PlanOut, PlanUpdate
 
 router = APIRouter()
 

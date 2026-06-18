@@ -2,21 +2,22 @@
 TV Control endpoints — admin sends commands + player pulls queue
 """
 import uuid
+
 from fastapi import APIRouter, Depends, HTTPException, Request
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.v1.deps import require_role
 from app.db import get_db
 from app.models.device import Device
-from app.models.user import User, Role
+from app.models.user import Role, User
 from app.schemas.tv_control import (
-    TVCommandRequest, TVCommandResponse, TVCommandStatus,
-    TVCommandInQueue, TVCommandAck,
+    TVCommandRequest,
+    TVCommandResponse,
+    TVCommandStatus,
 )
 from app.services import audit_service
-from app.services.tv_control import build_command, TVCommand, TVBrand
+from app.services.tv_control import TVBrand, TVCommand, build_command
 from app.services.tv_control import queue as tv_queue
-
 
 router = APIRouter()
 
@@ -46,14 +47,14 @@ async def send_command(
     try:
         brand = TVBrand(brand_str.lower())
     except ValueError:
-        raise HTTPException(400, f"TV brand '{brand_str}' ไม่รองรับ")
+        raise HTTPException(400, f"TV brand '{brand_str}' ไม่รองรับ") from None
 
     # สร้าง raw bytes
     cmd = TVCommand(brand=brand, command_type=payload.command_type, payload=payload.payload, set_id=payload.set_id)
     try:
         raw = build_command(cmd)
     except ValueError as e:
-        raise HTTPException(400, str(e))
+        raise HTTPException(400, str(e)) from e
 
     # enqueue
     cmd_id = await tv_queue.enqueue_command(

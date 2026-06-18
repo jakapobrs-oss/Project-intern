@@ -11,7 +11,10 @@ Architecture:
     player → POST /api/v1/player/commands/{id}/ack
 """
 from app.services.tv_control.base import (  # noqa: F401
-    TVCommand, TVCommandType, TVBrand, build_command,
+    TVBrand,
+    TVCommand,
+    TVCommandType,
+    build_command,
 )
 
 __all__ = ["TVCommand", "TVCommandType", "TVBrand", "build_command"]

@@ -1,9 +1,10 @@
 """Pydantic schemas — content"""
 import uuid
 from datetime import datetime
-from pydantic import BaseModel, Field, ConfigDict, HttpUrl
 
-from app.models.content import ContentType, ApprovalStatus
+from pydantic import BaseModel, ConfigDict, Field, HttpUrl
+
+from app.models.content import ApprovalStatus, ContentType
 
 
 class ContentBase(BaseModel):

@@ -4,13 +4,12 @@ Arq worker entry point
 
 รันด้วย: arq app.worker.WorkerSettings
 """
-from arq.connections import RedisSettings
 from arq import cron
+from arq.connections import RedisSettings
 from loguru import logger
 
 from app.config import settings
 from app.workers.emergency_tasks import expire_emergencies
-
 
 # ===== Task stubs (จะ implement ทีละ phase ตาม §37) =====
 

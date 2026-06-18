@@ -4,7 +4,8 @@ Plan model (= "Playlist" ในคำเดิม) — ลำดับของ 
 """
 import uuid
 from datetime import datetime
-from sqlalchemy import String, DateTime, Integer, Text, ForeignKey, Uuid, func
+
+from sqlalchemy import DateTime, ForeignKey, Integer, String, Text, Uuid, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db import Base

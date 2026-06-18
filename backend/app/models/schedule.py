@@ -5,7 +5,9 @@ Schedule model — ผูก plan ↔ player_group + ช่วงเวลา + 
 import enum
 import uuid
 from datetime import datetime
-from sqlalchemy import String, DateTime, Integer, Text, ForeignKey, Boolean, Enum as SAEnum, Uuid, func
+
+from sqlalchemy import Boolean, DateTime, ForeignKey, Integer, String, Text, Uuid, func
+from sqlalchemy import Enum as SAEnum
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.db import Base

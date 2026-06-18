@@ -9,11 +9,12 @@ Seed script — สร้าง super_admin user ตัวแรก
 """
 import asyncio
 import os
+
 from sqlalchemy import select
 
 from app.core.security import hash_password
 from app.db import SessionLocal
-from app.models.user import User, Role
+from app.models.user import Role, User
 
 
 async def seed_admin() -> None:
