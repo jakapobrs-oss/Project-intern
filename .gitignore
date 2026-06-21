@@ -30,6 +30,7 @@ build/
 .npm
 .yarn/
 *.log
+*.tsbuildinfo
 
 # ===== Android / Kotlin =====
 *.iml

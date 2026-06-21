@@ -1,0 +1,238 @@
+<!doctype html><html lang="th"><head><meta charset="utf-8"><style>
+*{box-sizing:border-box;}
+html{-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+body{font-family:'Angsana New','AngsanaNew','Leelawadee','Tahoma',serif;font-size:16pt;line-height:1.5;color:#000;margin:0;background:#fff;}
+.mk{font-size:1px;color:#fff;}
+section{page-break-inside:auto;}
+section.chapter{page-break-before:always;}
+.page-break{page-break-before:always;}
+/* cover */
+.cover{text-align:center;}
+.cover .logo{width:3.2cm;height:3.2cm;margin:2.2cm auto 1.2cm;border:1px dashed #bbb;display:flex;align-items:center;justify-content:center;color:#999;font-size:13pt;border-radius:50%;}
+.cover .doctype{font-size:18pt;font-weight:bold;margin:0.6cm 0;}
+.cover .title{font-size:18pt;font-weight:bold;line-height:1.5;margin:0 1.5cm;}
+.cover .by{margin-top:1.6cm;}
+.cover .cname2{font-weight:bold;}
+.cover .prog{margin-top:1.8cm;line-height:1.6;}
+.cover .uni{margin-top:1.6cm;line-height:1.6;}
+/* centered headings */
+.ctr{text-align:center;}
+h1.cno,h1.cname{text-align:center;font-weight:bold;font-size:18pt;margin:0;}
+h1.cname{margin-bottom:0.7cm;}
+h2{font-size:16pt;font-weight:bold;margin:0.45cm 0 0.05cm;}
+h2.ctr{font-size:18pt;margin:0 0 0.6cm;}
+h3{font-size:16pt;font-weight:bold;margin:0.3cm 0 0.05cm;padding-left:0.7cm;}
+p{margin:0;text-align:justify;text-indent:1.27cm;}
+p.noindent{text-indent:0;}
+ul,ol{margin:0.1cm 0 0.25cm;padding-left:1.4cm;}
+li{text-align:justify;margin:0.05cm 0;}
+strong{font-weight:bold;}
+code{font-family:Consolas,monospace;font-size:0.85em;background:#f3f3f3;padding:0 2px;}
+/* approval */
+.ctrpage .sign{margin-top:2cm;text-align:center;line-height:1.3;}
+.ctrpage .sign p{text-indent:0;text-align:center;margin:0.1cm 0;}
+/* figures */
+figure{text-align:center;margin:0.5cm 0 0.7cm;}
+.figimg{max-height:2.2cm;max-width:8cm;}
+.figph{display:inline-block;min-width:7cm;padding:0.9cm 1cm;border:1px dashed #aaa;color:#888;}
+figcaption{margin-top:0.25cm;font-size:16pt;}
+/* tables */
+table{border-collapse:collapse;width:100%;margin:0.35cm 0;font-size:15pt;}
+th,td{border:1px solid #000;padding:2px 6px;text-align:left;vertical-align:top;line-height:1.3;}
+th{font-weight:bold;}
+/* toc */
+.toc .tnumhdr{text-align:right;font-weight:bold;margin-bottom:0.2cm;}
+.trow{display:flex;align-items:baseline;}
+.trow .tlabel{white-space:nowrap;}
+.trow .tlead{flex:1;border-bottom:1px dotted #000;margin:0 0.25em;position:relative;top:-0.35em;}
+.trow .tnum{flex:none;width:1.6cm;text-align:right;}
+.trow.fm{font-weight:bold;}
+.trow.chap{font-weight:bold;margin-top:0.35cm;}
+.trow.chap .cnoT{display:inline-block;min-width:1.8cm;}
+.trow.s1{padding-left:1.2cm;}
+.trow.s2{padding-left:2.4cm;}
+</style></head><body><section class="cover">
+    <div class="logo">[ตราสัญลักษณ์สถาบัน]</div>
+    <div class="doctype">ปริญญานิพนธ์</div>
+    <div class="title">การพัฒนาระบบจัดการจอประชาสัมพันธ์ดิจิทัล<br>(Digital Signage Management System)</div>
+    <div class="by">โดย</div>
+    <div class="cname2">[ชื่อ-สกุลนักศึกษา]   [รหัสนักศึกษา]</div>
+    <div class="prog">ปริญญานิพนธ์นี้เป็นส่วนหนึ่งของการศึกษาตาม<br>หลักสูตร[ปริญญา] สาขาวิชา[สาขาวิชา]<br>[คณะ / วิทยาลัย]</div>
+    <div class="uni">[มหาวิทยาลัย]<br>ปีการศึกษา [25XX]</div>
+  </section><section class="page-break ctrpage">
+    <h2 class="ctr">ใบรับรองปริญญานิพนธ์</h2>
+    <p class="noindent ctr">[คณะ / วิทยาลัย] [มหาวิทยาลัย]</p>
+    <p class="noindent">หัวข้อ : การพัฒนาระบบจัดการจอประชาสัมพันธ์ดิจิทัล</p>
+    <p class="noindent">โดย : [ชื่อ-สกุลนักศึกษา]   [รหัสนักศึกษา]</p>
+    <div class="sign">
+      <p>...............................................</p><p>( [อาจารย์ที่ปรึกษา] )</p>
+      <p>...............................................</p><p>( [กรรมการ] )</p>
+      <p>...............................................</p><p>( [คณบดี / หัวหน้าสาขา] )</p>
+    </div></section><section class="page-break"><h2 class="ctr">บทคัดย่อ <span class="mk">mkr1mkr</span></h2><p>ระบบจัดการจอประชาสัมพันธ์ดิจิทัล (Digital Signage Management System) พัฒนาขึ้นเพื่อแก้ปัญหาการบริหารจัดการจอประชาสัมพันธ์หลายจุดในองค์กรที่เดิมต้องอัปเดตเนื้อหาและควบคุมจอด้วยมือทีละเครื่อง โดยรวมการจัดการเนื้อหา การจัดผังการแสดงผล การกำหนดตารางเวลาออกอากาศ การควบคุมจอโทรทัศน์และจอ LED ระยะไกลผ่านโปรโตคอล HDMI-CEC และ RS-232 ตลอดจนการประกาศเหตุฉุกเฉิน ไว้ในระบบกลางเพียงระบบเดียว</p><p>ระบบพัฒนาด้วยสถาปัตยกรรมแบบบริการหลายส่วน (FastAPI, PostgreSQL, Redis, MinIO และ Next.js) ทำงานในรูปแบบคอนเทนเนอร์ด้วย Docker มีระบบสิทธิ์ผู้ใช้แบบ RBAC กระบวนการอนุมัติเนื้อหา การบันทึกประวัติการใช้งาน และการเฝ้าระวังสถานะอุปกรณ์ ส่วนแสดงผลรองรับการทำงานแบบ offline-friendly ผ่านไฟล์ manifest ผลการพัฒนาได้ระบบที่ใช้งานได้ครบวงจรพร้อมการทดสอบอัตโนมัติประมาณ 133 กรณี</p><p class="noindent"><strong>คำสำคัญ:</strong> ป้ายประชาสัมพันธ์ดิจิทัล, การจัดการเนื้อหา, การควบคุมทีวีระยะไกล, HDMI-CEC, RS-232, FastAPI</p></section><section class="page-break"><h2 class="ctr">ABSTRACT <span class="mk">mkr2mkr</span></h2><p>The Digital Signage Management System was developed to address the challenge of managing multiple public-display screens within an organization, which previously required manual content updates and per-device screen control. The system consolidates content management, layout composition, broadcast scheduling, remote control of televisions and LED displays via HDMI-CEC and RS-232, and emergency announcements into a single centralized platform.</p><p>Built on a multi-service architecture (FastAPI, PostgreSQL, Redis, MinIO, and Next.js) running in Docker containers, the system provides role-based access control (RBAC), a content approval workflow, audit logging, and device monitoring. The player supports offline-friendly operation through manifest files. The result is a fully functional system accompanied by approximately 133 automated test cases.</p><p class="noindent"><strong>Keywords:</strong> Digital Signage, Content Management, Remote TV Control, HDMI-CEC, RS-232, FastAPI</p></section><section class="page-break"><h2 class="ctr">กิตติกรรมประกาศ <span class="mk">mkr3mkr</span></h2><p>ปริญญานิพนธ์ฉบับนี้สำเร็จลุล่วงได้ด้วยความกรุณาและการสนับสนุนจาก [สถานประกอบการ] และ [อาจารย์ที่ปรึกษา] ผู้จัดทำขอขอบพระคุณเป็นอย่างสูงมา ณ โอกาสนี้</p><p class="noindent">[ข้อความขอบคุณเพิ่มเติม — เติมเอง]</p></section><section class="page-break toc"><h2 class="ctr">สารบัญ</h2><div class="tnumhdr">หน้า</div><div class="trow fm"><span class="tlabel">บทคัดย่อภาษาไทย</span><span class="tlead"></span><span class="tnum">3</span></div><div class="trow fm"><span class="tlabel">บทคัดย่อภาษาอังกฤษ</span><span class="tlead"></span><span class="tnum">4</span></div><div class="trow fm"><span class="tlabel">กิตติกรรมประกาศ</span><span class="tlead"></span><span class="tnum">5</span></div><div class="trow chap"><span class="tlabel"><span class="cnoT">บทที่ 1</span><span>บทนำ</span></span><span class="tlead"></span><span class="tnum">8</span></div><div class="trow s1"><span class="tlabel">1.1 ความเป็นมาและความสำคัญของโครงงาน</span><span class="tlead"></span><span class="tnum">8</span></div><div class="trow s1"><span class="tlabel">1.2 วัตถุประสงค์ของโครงงาน</span><span class="tlead"></span><span class="tnum">8</span></div><div class="trow s1"><span class="tlabel">1.3 ขอบเขตของโครงงาน</span><span class="tlead"></span><span class="tnum">9</span></div><div class="trow s2"><span class="tlabel">1.3.1 ขอบเขตด้านปริมาณการใช้งาน</span><span class="tlead"></span><span class="tnum">9</span></div><div class="trow s2"><span class="tlabel">1.3.2 แพลตฟอร์มของจอแสดงผลที่รองรับ</span><span class="tlead"></span><span class="tnum">9</span></div><div class="trow s2"><span class="tlabel">1.3.3 การควบคุมจอโทรทัศน์และอุปกรณ์แสดงผล</span><span class="tlead"></span><span class="tnum">9</span></div><div class="trow s2"><span class="tlabel">1.3.4 ชนิดของเนื้อหาที่รองรับ</span><span class="tlead"></span><span class="tnum">9</span></div><div class="trow s2"><span class="tlabel">1.3.5 การติดตั้งและการนำไปใช้งาน</span><span class="tlead"></span><span class="tnum">9</span></div><div class="trow s2"><span class="tlabel">1.3.6 ข้อจำกัดของโครงงาน</span><span class="tlead"></span><span class="tnum">9</span></div><div class="trow s1"><span class="tlabel">1.4 ประโยชน์ที่คาดว่าจะได้รับ</span><span class="tlead"></span><span class="tnum">10</span></div><div class="trow chap"><span class="tlabel"><span class="cnoT">บทที่ 2</span><span>ทฤษฎีและเทคโนโลยีที่เกี่ยวข้อง</span></span><span class="tlead"></span><span class="tnum">11</span></div><div class="trow s1"><span class="tlabel">2.1 ระบบป้ายประชาสัมพันธ์ดิจิทัล (Digital Signage)</span><span class="tlead"></span><span class="tnum">11</span></div><div class="trow s1"><span class="tlabel">2.2 FastAPI และภาษา Python</span><span class="tlead"></span><span class="tnum">11</span></div><div class="trow s1"><span class="tlabel">2.3 PostgreSQL, SQLAlchemy และ Alembic</span><span class="tlead"></span><span class="tnum">12</span></div><div class="trow s1"><span class="tlabel">2.4 Next.js, TypeScript และ Tailwind CSS</span><span class="tlead"></span><span class="tnum">12</span></div><div class="trow s1"><span class="tlabel">2.5 Redis และ Arq</span><span class="tlead"></span><span class="tnum">12</span></div><div class="trow s1"><span class="tlabel">2.6 MinIO</span><span class="tlead"></span><span class="tnum">13</span></div><div class="trow s1"><span class="tlabel">2.7 Docker และการทำคอนเทนเนอร์ (Containerization)</span><span class="tlead"></span><span class="tnum">13</span></div><div class="trow s1"><span class="tlabel">2.8 HDMI-CEC และ RS-232</span><span class="tlead"></span><span class="tnum">13</span></div><div class="trow s1"><span class="tlabel">2.9 ความปลอดภัยของระบบ (Security)</span><span class="tlead"></span><span class="tnum">14</span></div><div class="trow chap"><span class="tlabel"><span class="cnoT">บทที่ 3</span><span>การวิเคราะห์และออกแบบระบบ</span></span><span class="tlead"></span><span class="tnum">15</span></div><div class="trow s1"><span class="tlabel">3.1 การวิเคราะห์ความต้องการของระบบ</span><span class="tlead"></span><span class="tnum">15</span></div><div class="trow s1"><span class="tlabel">3.2 เครื่องมือที่ใช้ในการพัฒนา</span><span class="tlead"></span><span class="tnum">15</span></div><div class="trow s2"><span class="tlabel">3.2.1 ฮาร์ดแวร์ (Hardware)</span><span class="tlead"></span><span class="tnum">15</span></div><div class="trow s2"><span class="tlabel">3.2.2 ซอฟต์แวร์ (Software)</span><span class="tlead"></span><span class="tnum">15</span></div><div class="trow s1"><span class="tlabel">3.3 การออกแบบระบบ</span><span class="tlead"></span><span class="tnum">16</span></div><div class="trow s2"><span class="tlabel">3.3.1 สถาปัตยกรรมระบบ (System Architecture)</span><span class="tlead"></span><span class="tnum">16</span></div><div class="trow s2"><span class="tlabel">3.3.2 การออกแบบฐานข้อมูล (ER Diagram)</span><span class="tlead"></span><span class="tnum">16</span></div><div class="trow s2"><span class="tlabel">3.3.3 แนวคิดลำดับชั้นเนื้อหาแบบ 5 ระดับ (5-Tier Content Hierarchy)</span><span class="tlead"></span><span class="tnum">16</span></div><div class="trow s2"><span class="tlabel">3.3.4 การออกแบบส่วนติดต่อโปรแกรม (API)</span><span class="tlead"></span><span class="tnum">16</span></div><div class="trow s1"><span class="tlabel">3.4 วิธีการพัฒนา</span><span class="tlead"></span><span class="tnum">16</span></div><div class="trow s1"><span class="tlabel">3.5 การออกแบบการทดสอบ</span><span class="tlead"></span><span class="tnum">17</span></div><div class="trow chap"><span class="tlabel"><span class="cnoT">บทที่ 4</span><span>ผลการดำเนินงาน</span></span><span class="tlead"></span><span class="tnum">18</span></div><div class="trow s1"><span class="tlabel">4.1 ภาพรวมระบบที่พัฒนา</span><span class="tlead"></span><span class="tnum">18</span></div><div class="trow s1"><span class="tlabel">4.2 โมดูลและความสามารถหลัก</span><span class="tlead"></span><span class="tnum">18</span></div><div class="trow s1"><span class="tlabel">4.3 หน้าจอส่วนจัดการสำหรับผู้ดูแล (Admin UI)</span><span class="tlead"></span><span class="tnum">19</span></div><div class="trow s1"><span class="tlabel">4.4 ส่วนแสดงผล (Player)</span><span class="tlead"></span><span class="tnum">19</span></div><div class="trow chap"><span class="tlabel"><span class="cnoT">บทที่ 5</span><span>สรุปผลและข้อเสนอแนะ</span></span><span class="tlead"></span><span class="tnum">20</span></div><div class="trow s1"><span class="tlabel">5.1 สรุปผลการดำเนินงาน</span><span class="tlead"></span><span class="tnum">20</span></div><div class="trow s1"><span class="tlabel">5.2 ปัญหาที่พบและแนวทางแก้ไข</span><span class="tlead"></span><span class="tnum">20</span></div><div class="trow s1"><span class="tlabel">5.3 ข้อเสนอแนะและการพัฒนาต่อยอด</span><span class="tlead"></span><span class="tnum">20</span></div><div class="trow s1"><span class="tlabel">5.4 สิ่งที่ได้เรียนรู้จากการฝึกงาน</span><span class="tlead"></span><span class="tnum">21</span></div></section><section class="chapter"><h1 class="cno">บทที่ 1 <span class="mk">mkr4mkr</span></h1><h1 class="cname">บทนำ</h1><h2>1.1 ความเป็นมาและความสำคัญของโครงงาน <span class="mk">mkr5mkr</span></h2>
+<p>ในปัจจุบัน องค์กรขนาดใหญ่ เช่น โรงพยาบาล สถานศึกษา และหน่วยงานราชการ นิยมใช้จอแสดงผลเพื่อประชาสัมพันธ์ข้อมูลข่าวสารแก่ผู้มาใช้บริการตามจุดต่าง ๆ ภายในอาคาร ระบบลักษณะนี้เรียกว่า "ระบบป้ายประชาสัมพันธ์ดิจิทัล" (Digital Signage) ซึ่งช่วยให้การสื่อสารข้อมูลทำได้รวดเร็วและปรับเปลี่ยนได้ตลอดเวลา อย่างไรก็ตาม เมื่อจำนวนจอเพิ่มมากขึ้นและกระจายอยู่หลายจุด การบริหารจัดการเนื้อหาและการควบคุมจอแต่ละเครื่องด้วยวิธีเดิม เช่น การนำไฟล์ใส่อุปกรณ์ USB ไปเสียบที่จอทีละเครื่อง หรือการเดินไปเปิด-ปิดจอด้วยมือ ก่อให้เกิดปัญหาหลายประการ ได้แก่ ความล่าช้าในการอัปเดตเนื้อหา ความไม่สอดคล้องของข้อมูลระหว่างจอ ความยากในการกำหนดตารางการแสดงผล และการขาดช่องทางในการประกาศข้อมูลเร่งด่วนหรือเหตุฉุกเฉินได้ทันท่วงที</p>
+<p>จากปัญหาดังกล่าว ผู้จัดทำจึงได้พัฒนา "ระบบจัดการจอประชาสัมพันธ์ดิจิทัล (Digital Signage Management System)" ขึ้น เพื่อรวมการจัดการเนื้อหา การจัดผังการแสดงผล (layout) การกำหนดตารางเวลาออกอากาศ (schedule) การควบคุมจอโทรทัศน์ระยะไกล ตลอดจนการประกาศเหตุฉุกเฉิน ไว้ในระบบกลางเพียงระบบเดียว ผู้ดูแลสามารถสั่งงานผ่านเว็บแอปพลิเคชันจากศูนย์กลางได้ โดยไม่ต้องเดินไปจัดการที่หน้าจอแต่ละเครื่อง ช่วยลดทั้งเวลาและความผิดพลาดในการดำเนินงาน</p>
+<p>ระบบออกแบบให้ทำงานภายในเครือข่ายภายในองค์กร (LAN) รองรับการเล่นเนื้อหาแบบ offline-friendly ผ่านไฟล์ manifest เพื่อให้จอยังแสดงผลต่อได้แม้เครือข่ายขัดข้องชั่วคราว มีระบบสิทธิ์ผู้ใช้ (RBAC) และกระบวนการอนุมัติเนื้อหาเพื่อความปลอดภัยและความถูกต้องของข้อมูล รวมถึงการบันทึกประวัติการใช้งาน (audit log) และการเฝ้าระวังสถานะอุปกรณ์ นอกจากนี้ยังพัฒนาด้วยเทคโนโลยี Open Source ทั้งหมด และติดตั้งด้วย Docker เพื่อให้ปรับใช้และดูแลรักษาได้ง่าย ลดต้นทุนค่าลิขสิทธิ์ซอฟต์แวร์</p>
+<h2>1.2 วัตถุประสงค์ของโครงงาน <span class="mk">mkr6mkr</span></h2>
+<ol>
+<li>เพื่อพัฒนาระบบจัดการเนื้อหาและตารางการแสดงผลของจอประชาสัมพันธ์จากศูนย์กลาง</li>
+<li>เพื่อรองรับการควบคุมจอโทรทัศน์ระยะไกล (เปิด/ปิด/เปลี่ยนช่องสัญญาณเข้า) ผ่านโปรโตคอล HDMI-CEC และ RS-232 ได้หลายยี่ห้อ</li>
+<li>เพื่อจัดให้มีระบบสิทธิ์ผู้ใช้ (RBAC) และกระบวนการอนุมัติเนื้อหาและตารางก่อนเผยแพร่</li>
+<li>เพื่อรองรับการประกาศเหตุฉุกเฉินที่สามารถแทรก (override) ตารางการแสดงผลปกติได้ทันที</li>
+<li>เพื่อเฝ้าระวังสถานะของอุปกรณ์และบันทึกประวัติการกระทำ (audit log) ทุกรายการ</li>
+<li>เพื่อพัฒนาระบบด้วยเทคโนโลยี Open Source และสามารถติดตั้งใช้งานด้วย Docker ได้</li>
+</ol>
+<h2>1.3 ขอบเขตของโครงงาน <span class="mk">mkr7mkr</span></h2>
+<h3>1.3.1 ขอบเขตด้านปริมาณการใช้งาน <span class="mk">mkr8mkr</span></h3>
+<p>รองรับการบริหารจัดการจอประชาสัมพันธ์ระดับ 10–20 จุด (ขนาด Proof of Concept) และสามารถขยายจำนวนได้ผ่านการจัดกลุ่มจอ (player group)</p>
+<h3>1.3.2 แพลตฟอร์มของจอแสดงผลที่รองรับ <span class="mk">mkr9mkr</span></h3>
+<p>รองรับ Android TV, แท็บเล็ต Android, Raspberry Pi (โหมด kiosk), เครื่องคอมพิวเตอร์ Windows และเว็บเบราว์เซอร์ (PWA)</p>
+<h3>1.3.3 การควบคุมจอโทรทัศน์และอุปกรณ์แสดงผล <span class="mk">mkr10mkr</span></h3>
+<p>รองรับการสั่งงานทีวีผ่าน HDMI-CEC และ RS-232 ได้หลายยี่ห้อ (เช่น Samsung MDC, LG, Sony) รวมถึงการควบคุมจอ LED ผ่านโมดูลควบคุม LED</p>
+<h3>1.3.4 ชนิดของเนื้อหาที่รองรับ <span class="mk">mkr11mkr</span></h3>
+<p>รองรับเนื้อหาประเภทรูปภาพ (image) วิดีโอ (video) หน้าเว็บ (web) สตรีม (stream) และข้อความ (text)</p>
+<h3>1.3.5 การติดตั้งและการนำไปใช้งาน <span class="mk">mkr12mkr</span></h3>
+<p>ออกแบบให้ติดตั้งแบบ on-premise บนระบบปฏิบัติการ Linux (Ubuntu 22.04) ด้วย Docker Compose</p>
+<h3>1.3.6 ข้อจำกัดของโครงงาน <span class="mk">mkr13mkr</span></h3>
+<p>เป็นการพัฒนาระบบใหม่ (greenfield) จึงไม่รวมการย้ายข้อมูลจากระบบเดิม (data migration)</p>
+<h2>1.4 ประโยชน์ที่คาดว่าจะได้รับ <span class="mk">mkr14mkr</span></h2>
+<ol>
+<li>ลดเวลาและข้อผิดพลาดในการอัปเดตเนื้อหา เนื่องจากบริหารจัดการได้จากศูนย์กลาง</li>
+<li>ลดภาระการเดินไปควบคุมจอแต่ละเครื่อง ด้วยการสั่งเปิด/ปิด/เปลี่ยนสัญญาณจากระยะไกล</li>
+<li>เพิ่มความปลอดภัยและความถูกต้องของข้อมูล ด้วยระบบสิทธิ์ผู้ใช้และกระบวนการอนุมัติ</li>
+<li>สามารถสื่อสารข้อมูลเร่งด่วนหรือเหตุฉุกเฉินไปยังทุกจอได้ทันที</li>
+<li>ลดต้นทุนค่าลิขสิทธิ์ซอฟต์แวร์ ด้วยการใช้เทคโนโลยี Open Source</li>
+<li>ได้ระบบต้นแบบที่สามารถนำไปขยายผลและต่อยอดในองค์กรจริงได้</li>
+</ol></section>
+<section class="chapter"><h1 class="cno">บทที่ 2 <span class="mk">mkr15mkr</span></h1><h1 class="cname">ทฤษฎีและเทคโนโลยีที่เกี่ยวข้อง</h1><p>ในบทนี้กล่าวถึงทฤษฎีและเทคโนโลยีที่นำมาใช้ในการพัฒนาระบบจัดการจอประชาสัมพันธ์ดิจิทัล เพื่อให้เข้าใจหลักการทำงานของเครื่องมือแต่ละส่วนก่อนนำไปสู่การออกแบบและพัฒนาในบทต่อไป</p>
+<h2>2.1 ระบบป้ายประชาสัมพันธ์ดิจิทัล (Digital Signage) <span class="mk">mkr16mkr</span></h2>
+<p>ระบบป้ายประชาสัมพันธ์ดิจิทัล คือระบบที่ใช้จอแสดงผลอิเล็กทรอนิกส์ในการนำเสนอเนื้อหาดิจิทัล เช่น รูปภาพ วิดีโอ และข้อความ โดยสามารถควบคุมและปรับเปลี่ยนเนื้อหาจากศูนย์กลางผ่านเครือข่าย องค์ประกอบหลักประกอบด้วยส่วนจัดการเนื้อหา (Content Management) ส่วนแสดงผลที่ติดตั้งกับจอ (Player) และช่องทางสื่อสารระหว่างสองส่วนนี้ ทำให้องค์กรสามารถอัปเดตเนื้อหาและกำหนดตารางการแสดงผลล่วงหน้าได้อย่างมีประสิทธิภาพ</p>
+<figure><div class="figph">[ ภาพประกอบ: ระบบ Digital Signage ]</div><figcaption>รูปที่ 2.1&nbsp;&nbsp;ระบบ Digital Signage</figcaption></figure>
+<h2>2.2 FastAPI และภาษา Python <span class="mk">mkr17mkr</span></h2>
+<p>FastAPI เป็นเว็บเฟรมเวิร์กภาษา Python สำหรับสร้าง REST API ที่ทำงานแบบ asynchronous มีจุดเด่นด้านประสิทธิภาพสูง การตรวจสอบชนิดข้อมูลด้วย type hints และการสร้างเอกสาร API อัตโนมัติในรูปแบบ OpenAPI (Swagger) ในระบบนี้ใช้ FastAPI 0.115 ร่วมกับ Python 3.12 เป็นแกนหลักของฝั่ง backend สำหรับจัดการตรรกะทางธุรกิจและให้บริการ API แก่ส่วนอื่น ๆ</p>
+<figure><img class="figimg" src="data:image/svg+xml;base64,PHN2ZyBmaWxsPSIjMDA5Njg4IiByb2xlPSJpbWciIHZpZXdCb3g9IjAgMCAyNCAyNCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48dGl0bGU+RmFzdEFQSTwvdGl0bGU+PHBhdGggZD0iTTEyIC4wMzg3QzUuMzcyOS4wMzg0LjAwMDMgNS4zOTMxIDAgMTEuOTk4OGMtLjAwMSA2LjYwNjYgNS4zNzIgMTEuOTYyOCAxMiAxMS45NjI1IDYuNjI4LjAwMDMgMTIuMDAxLTUuMzU1OSAxMi0xMS45NjI1LS4wMDAzLTYuNjA1Ny01LjM3MjktMTEuOTYwNC0xMi0xMS45Nm0tLjgyOSA1LjQxNTNoNy41NWwtNy41ODA1IDUuMzI4NGg1LjE4MjhMNS4yNzkgMTguNTQzNnEyLjk0NjYtNi41NDQ0IDUuODkyLTEzLjA4OTYiLz48L3N2Zz4=" alt="FastAPI"><figcaption>รูปที่ 2.2&nbsp;&nbsp;FastAPI</figcaption></figure>
+<h2>2.3 PostgreSQL, SQLAlchemy และ Alembic <span class="mk">mkr18mkr</span></h2>
+<p>PostgreSQL เป็นระบบจัดการฐานข้อมูลเชิงสัมพันธ์ (RDBMS) แบบ open source ที่มีความเสถียรและรองรับข้อมูลปริมาณมาก ระบบนี้ใช้ PostgreSQL 16 เป็นฐานข้อมูลหลัก โดยเข้าถึงผ่าน SQLAlchemy 2.x ซึ่งเป็น Object-Relational Mapping (ORM) แบบ async และใช้ Alembic ในการจัดการการเปลี่ยนแปลงโครงสร้างฐานข้อมูล (migration) อย่างเป็นระบบ</p>
+<figure><img class="figimg" src="data:image/svg+xml;base64,PHN2ZyBmaWxsPSIjNDE2OUUxIiByb2xlPSJpbWciIHZpZXdCb3g9IjAgMCAyNCAyNCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48dGl0bGU+UG9zdGdyZVNRTDwvdGl0bGU+PHBhdGggZD0iTTIzLjU1OTQgMTQuNzIyOGEuNTI2OS41MjY5IDAgMCAwLS4wNTYzLS4xMTkxYy0uMTM5LS4yNjMyLS40NzY4LS4zNDE4LTEuMDA3NC0uMjMyMS0xLjY1MzMuMzQxMS0yLjI5MzUuMTMxMi0yLjUyNTYtLjAxOTEgMS4zNDItMi4wNDgyIDIuNDQ1LTQuNTIyIDMuMDQxMS02LjgyOTcuMjcxNC0xLjA1MDcuNzk4Mi0zLjUyMzcuMTIyMi00LjczMTZhMS41NjQxIDEuNTY0MSAwIDAgMC0uMTUwOS0uMjM1QzIxLjY5MzEuOTA4NiAxOS44MDA3LjAyNDggMTcuNTA5OS4wMDA1Yy0xLjQ5NDctLjAxNTgtMi43NzA1LjM0NjEtMy4xMTYxLjQ3OTRhOS40NDkgOS40NDkgMCAwIDAtLjUxNTktLjA4MTYgOC4wNDQgOC4wNDQgMCAwIDAtMS4zMTE0LS4xMjc4Yy0xLjE4MjItLjAxODQtMi4yMDM4LjI2NDItMy4wNDk4Ljg0MDYtLjg1NzMtLjMyMTEtNC43ODg4LTEuNjQ1LTcuMjIxOS4wNzg4Qy45MzU5IDIuMTUyNi4zMDg2IDMuODczMy40MzAyIDYuMzA0M2MuMDQwOS44MTguNTA2OSAzLjMzNCAxLjI0MjMgNS43NDM2LjQ1OTggMS41MDY1LjkzODcgMi43MDE5IDEuNDMzNCAzLjU4Mi41NTMuOTk0MiAxLjEyNTkgMS41OTMzIDEuNzE0MyAxLjc4OTUuNDQ3NC4xNDkxIDEuMTMyNy4xNDQxIDEuODU4MS0uNzI3OS44MDEyLS45NjM1IDEuNTkwMy0xLjgyNTggMS45NDQ2LTIuMjA2OS40MzUxLjIzNTUuOTA2NC4zNjI1IDEuMzkuMzc3MmEuMDU2OS4wNTY5IDAgMCAwIC4wMDA0LjAwNDEgMTEuMDMxMiAxMS4wMzEyIDAgMCAwLS4yNDcyLjMwNTRjLS4zMzg5LjQzMDItLjQwOTQuNTE5Ny0xLjUwMDIuNzQ0My0uMzEwMi4wNjQtMS4xMzQ0LjIzMzktMS4xNDY0LjgxMTUtLjAwMjUuMTIyNC4wMzI5LjIzMDkuMDkxOS4zMjY4LjIyNjkuNDIzMS45MjE2LjYwOTcgMS4wMTUuNjMzMSAxLjMzNDUuMzMzNSAyLjUwNDQuMDkyIDMuMzcxNC0uNjc4Ny0uMDE3IDIuMjMxLjA3NzUgNC40MTc0LjM0NTQgNS4wODc0LjIyMTIuNTUyOS43NjE4IDEuOTA0NSAyLjQ2OTIgMS45MDQzLjI1MDUgMCAuNTI2My0uMDI5MS44Mjk2LS4wOTQxIDEuNzgxOS0uMzgyMSAyLjU1NTctMS4xNjk2IDIuODU1LTIuOTA1OS4xNTAzLS44NzA3LjQwMTYtMi44NzUzLjUzODgtNC4xMDEyLjAxNjktLjA3MDMuMDM1Ny0uMTIwNy4wNTctLjEzNjIuMDAwNy0uMDAwNS4wNjk3LS4wNDcxLjQyNzIuMDMwN2EuMzY3My4zNjczIDAgMCAwIC4wNDQzLjAwNjhsLjI1MzkuMDIyMy4wMTQ5LjAwMWMuODQ2OC4wMzg0IDEuOTExNC0uMTQyNiAyLjUzMTItLjQzMDguNjQzOC0uMjk4OCAxLjgwNTctMS4wMzIzIDEuNTk1MS0xLjY2OTh6TTIuMzcxIDExLjg3NjVjLS43NDM1LTIuNDM1OC0xLjE3NzktNC44ODUxLTEuMjEyMy01LjU3MTktLjEwODYtMi4xNzE0LjQxNzEtMy42ODI5IDEuNTYyMy00LjQ5MjcgMS44MzY3LTEuMjk4NiA0LjgzOTgtLjU0MDggNi4xMDgtLjEzLS4wMDMyLjAwMzItLjAwNjYuMDA2MS0uMDA5OC4wMDk0LTIuMDIzOCAyLjA0NC0xLjk3NTggNS41MzYtMS45NzA4IDUuNzQ5NS0uMDAwMi4wODIzLjAwNjYuMTk4OS4wMTYyLjM1OTMuMDM0OC41ODczLjA5OTYgMS42ODA0LS4wNzM1IDIuOTE4NC0uMTYwOSAxLjE1MDQuMTkzNyAyLjI3NjQuOTcyOCAzLjA4OTIuMDgwNi4wODQxLjE2NDguMTYzMS4yNTE4LjIzNzQtLjM0NjguMzcxNC0xLjEwMDQgMS4xOTI2LTEuOTAyNSAyLjE1NzYtLjU2NzcuNjgyNS0uOTU5Ny41NTE3LTEuMDg4Ni41MDg3LS4zOTE5LS4xMzA3LS44MTMtLjU4NzEtMS4yMzgxLTEuMzIyMy0uNDc5Ni0uODM5LS45NjM1LTIuMDMxNy0xLjQxNTUtMy41MTI2em02LjAwNzIgNS4wODcxYy0uMTcxMS0uMDQyOC0uMzI3MS0uMTEzMi0uNDMyMi0uMTc3Mi4wODg5LS4wMzk0LjIzNzQtLjA5MDIuNDgzMy0uMTQwOSAxLjI4MzMtLjI2NDEgMS40ODE1LS40NTA2IDEuOTE0My0xLjAwMDIuMDk5Mi0uMTI2LjIxMTYtLjI2ODcuMzY3My0uNDQyNmEuMzU0OS4zNTQ5IDAgMCAwIC4wNzM3LS4xMjk4Yy4xNzA4LS4xNTEzLjI3MjQtLjEwOTkuNDM2OS0uMDQxNy4xNTYuMDY0Ni4zMDc4LjI2LjM2OTUuNDc1Mi4wMjkxLjEwMTYuMDYxOS4yOTQ1LS4wNDUyLjQ0NDQtLjkwNDMgMS4yNjU4LTIuMjIxNiAxLjI0OTQtMy4xNjc2IDEuMDEyOHptMi4wOTQtMy45ODgtLjA1MjUuMTQxYy0uMTMzLjM1NjYtLjI1NjcuNjg4MS0uMzMzNCAxLjAwMy0uNjY3NC0uMDAyMS0xLjMxNjgtLjI4NzItMS44MTA1LS44MDI0LS42Mjc5LS42NTUxLS45MTMxLTEuNTY2NC0uNzgyNS0yLjUwMDQuMTgyOC0xLjMwNzkuMTE1My0yLjQ0NjguMDc5LTMuMDU4Ni0uMDA1LS4wODU3LS4wMDk1LS4xNjA3LS4wMTIyLS4yMTk5LjI5NTctLjI2MjEgMS42NjU5LS45OTYyIDIuNjQyOS0uNzcyNC40NDU5LjEwMjIuNzE3Ni40MDU3LjgzMDUuOTI4LjU4NDYgMi43MDM4LjA3NzQgMy44MzA3LS4zMzAyIDQuNzM2My0uMDg0LjE4NjYtLjE2MzMuMzYyOS0uMjMxMS41NDU0em03LjM2MzcgNC41NzI1Yy0uMDE2OS4xNzY4LS4wMzU4LjM3Ni0uMDYxOC41OTU5bC0uMTQ2LjQzODNhLjM1NDcuMzU0NyAwIDAgMC0uMDE4Mi4xMDc3Yy0uMDA1OS40NzQ3LS4wNTQuNjQ4OS0uMTE1Ljg2OTMtLjA2MzQuMjI5Mi0uMTM1My40ODkxLS4xNzk0IDEuMDU3NS0uMTEgMS40MTQzLS44NzgyIDIuMjI2Ny0yLjQxNzIgMi41NTY1LTEuNTE1NS4zMjUxLTEuNzg0My0uNDk2OC0yLjAyMTItMS4yMjE3YTYuNTgyNCA2LjU4MjQgMCAwIDAtLjA3NjktLjIyNjZjLS4yMTU0LS41ODU4LS4xOTExLTEuNDExOS0uMTU3NC0yLjU1NTEuMDE2NS0uNTYxMi0uMDI0OS0xLjkwMTMtLjMzMDItMi42NDYyLjAwNDQtLjI5MzIuMDEwNi0uNTkwOS4wMTktLjg5MThhLjM1MjkuMzUyOSAwIDAgMC0uMDE1My0uMTEyNiAxLjQ5MjcgMS40OTI3IDAgMCAwLS4wNDM5LS4yMDhjLS4xMjI2LS40MjgzLS40MjEzLS43ODY2LS43Nzk3LS45MzUxLS4xNDI0LS4wNTktLjQwMzgtLjE2NzItLjcxNzgtLjA4NjkuMDY3LS4yNzYuMTgzMS0uNTg3NS4zMDktLjkyNDlsLjA1MjktLjE0MmMuMDU5NS0uMTYuMTM0LS4zMjU3LjIxMy0uNTAxMi40MjY1LS45NDc2IDEuMDEwNi0yLjI0NTMuMzc2Ni01LjE3NzItLjIzNzQtMS4wOTgxLTEuMDMwNC0xLjYzNDMtMi4yMzI0LTEuNTA5OC0uNzIwNy4wNzQ2LTEuMzc5OS4zNjU0LTEuNzA4OC41MzIxYTUuNjcxNiA1LjY3MTYgMCAwIDAtLjE5NTguMTA0MWMuMDkxOC0xLjEwNjQuNDM4Ni0zLjE3NDEgMS43MzU3LTQuNDgyM2E0LjAzMDYgNC4wMzA2IDAgMCAxIC4zMDMzLS4yNzYuMzUzMi4zNTMyIDAgMCAwIC4xNDQ3LS4wNjQ0Yy43NTI0LS41NzA2IDEuNjk0NS0uODUwNiAyLjgwMi0uODMyNS40MDkxLjAwNjcuODAxNy4wMzM5IDEuMTc0Mi4wODEgMS45MzkuMzU0NCAzLjI0MzkgMS40NDY4IDQuMDM1OSAyLjM4MjcuODE0My45NjIzIDEuMjU1MiAxLjkzMTUgMS40MzEyIDIuNDU0My0xLjMyMzItLjEzNDYtMi4yMjM0LjEyNjgtMi42Nzk3Ljc3OS0uOTkyNiAxLjQxODkuNTQzIDQuMTcyOSAxLjI4MTEgNS40OTY0LjEzNTMuMjQyNi4yNTIyLjQ1MjIuMjg4OS41NDEzLjI0MDMuNTgyNS41NTE1Ljk3MTMuNzc4NyAxLjI1NTIuMDY5Ni4wODcuMTM3Mi4xNzE0LjE4ODUuMjQ1LS40MDA4LjExNTUtMS4xMjA4LjM4MjUtMS4wNTUyIDEuNzE3LS4wMTIzLjE1NjMtLjA0MjMuNDQ2OS0uMDgzNC44MTQ4LS4wNDYxLjIwNzctLjA3MDIuNDYwMy0uMDk5NC43NjYyem0uODkwNS0xLjYyMTFjLS4wNDA1LS44MzE2LjI2OTEtLjkxODUuNTk2Ny0xLjAxMDVhMi44NTY2IDIuODU2NiAwIDAgMCAuMTM1LS4wNDA2IDEuMjAyIDEuMjAyIDAgMCAwIC4xMzQyLjEwM2MuNTcwMy4zNzY1IDEuNTgyMy40MjEzIDMuMDA2OC4xMzQ0LS4yMDE2LjE3NjktLjUxODkuMzk5NC0uOTUzMy42MDExLS40MDk4LjE5MDMtMS4wOTU3LjMzMy0xLjc0NzMuMzYzNi0uNzE5Ny4wMzM2LTEuMDg1OS0uMDgwNy0xLjE3MjEtLjE1MXptLjU2OTUtOS4yNzEyYy0uMDA1OS4zNTA4LS4wNTQyLjY2OTItLjEwNTQgMS4wMDE3LS4wNTUuMzU3Ni0uMTEyLjcyNzQtLjEyNjQgMS4xNzYyLS4wMTQyLjQzNjguMDQwNC44OTA5LjA5MzIgMS4zMzAxLjEwNjYuODg3LjIxNiAxLjgwMDMtLjIwNzUgMi43MDE0YTMuNTI3MiAzLjUyNzIgMCAwIDEtLjE4NzYtLjM4NTZjLS4wNTI3LS4xMjc2LS4xNjY5LS4zMzI2LS4zMjUxLS42MTYyLS42MTU2LTEuMTA0MS0yLjA1NzQtMy42ODk2LTEuMzE5My00Ljc0NDYuMzc5NS0uNTQyNyAxLjM0MDgtLjU2NjEgMi4xNzgxLS40NjN6bS4yMjg0IDcuMDEzN2ExMi4zNzYyIDEyLjM3NjIgMCAwIDAtLjA4NTMtLjEwNzRsLS4wMzU1LS4wNDQ0Yy43MjYyLTEuMTk5NS41ODQyLTIuMzg2Mi40NTc4LTMuNDM4NS0uMDUxOS0uNDMxOC0uMTAwOS0uODM5Ni0uMDg4NS0xLjIyMjYuMDEyOS0uNDA2MS4wNjY2LS43NTQzLjExODUtMS4wOTExLjA2MzktLjQxNS4xMjg4LS44NDQzLjExMDktMS4zNTA1LjAxMzQtLjA1MzEuMDE4OC0uMTE1OC4wMTE4LS4xOTAyLS4wNDU3LS40ODU1LS41OTk5LTEuOTM4LTEuNzI5NC0zLjI1My0uNjA3Ni0uNzA3My0xLjQ4OTYtMS40OTcyLTIuNjg4OS0yLjAzOTUuNTI1MS0uMTA2NiAxLjIzMjgtLjIwMzUgMi4wMjQ0LS4xODU5IDIuMDUxNS4wNDU2IDMuNjc0Ni44MTM1IDQuODI0MiAyLjI4MjRhLjkwOC45MDggMCAwIDEgLjA2NjcuMTAwMmMuNzIzMSAxLjM1NTYtLjI3NjIgNi4yNzUxLTIuOTg2NyAxMC41NDA1em0tOC44MTY2LTYuMTE2MmMtLjAyNS4xNzk0LS4zMDg5LjQyMjUtLjYyMTEuNDIyNWEuNTgyMS41ODIxIDAgMCAxLS4wODA5LS4wMDU2Yy0uMTg3My0uMDI2LS4zNzY1LS4xNDQtLjUwNTktLjMxNTYtLjA0NTgtLjA2MDUtLjEyMDMtLjE3OC0uMTA1NS0uMjg0NC4wMDU1LS4wNDAxLjAyNjEtLjA5ODUuMDkyNS0uMTQ4OC4xMTgyLS4wODk0LjM1MTgtLjEyMjYuNjA5Ni0uMDg2Ny4zMTYzLjA0NDEuNjQyNi4xOTM4LjYxMTMuNDE4NnptNy45MzA1LS40MTE0Yy4wMTExLjA3OTItLjA0OS4yMDEtLjE1MzEuMzEwMi0uMDY4My4wNzE3LS4yMTIuMTk2MS0uNDA3OS4yMjMyYS41NDU2LjU0NTYgMCAwIDEtLjA3NS4wMDUyYy0uMjkzNSAwLS41NDE0LS4yMzQ0LS41NjA3LS4zNzE3LS4wMjQtLjE3NjUuMjY0MS0uMzEwNi41NjExLS4zNTIuMjk3LS4wNDE0LjYxMTEuMDA4OC42MzU2LjE4NTF6Ii8+PC9zdmc+" alt="PostgreSQL"><figcaption>รูปที่ 2.3&nbsp;&nbsp;PostgreSQL</figcaption></figure>
+<h2>2.4 Next.js, TypeScript และ Tailwind CSS <span class="mk">mkr19mkr</span></h2>
+<p>Next.js เป็นเฟรมเวิร์กที่พัฒนาต่อยอดจาก React สำหรับสร้างเว็บแอปพลิเคชันที่รองรับทั้ง server-side rendering และ static generation ใช้ร่วมกับ TypeScript เพื่อเพิ่มความปลอดภัยด้านชนิดข้อมูล และ Tailwind CSS ซึ่งเป็น Utility-first CSS Framework สำหรับออกแบบหน้าตาให้ทันสมัยและรองรับการแสดงผลหลายขนาดหน้าจอ (responsive) ในระบบนี้ใช้สร้างหน้าจอส่วนจัดการสำหรับผู้ดูแล (Admin UI)</p>
+<figure><img class="figimg" src="data:image/svg+xml;base64,PHN2ZyBmaWxsPSIjMDAwMDAwIiByb2xlPSJpbWciIHZpZXdCb3g9IjAgMCAyNCAyNCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48dGl0bGU+TmV4dC5qczwvdGl0bGU+PHBhdGggZD0iTTE4LjY2NSAyMS45NzhDMTYuNzU4IDIzLjI1NSAxNC40NjUgMjQgMTIgMjQgNS4zNzcgMjQgMCAxOC42MjMgMCAxMlM1LjM3NyAwIDEyIDBzMTIgNS4zNzcgMTIgMTJjMCAzLjU4My0xLjU3NCA2LjgwMS00LjA2NyA5LjAwMUw5LjIxOSA3LjJINy4ydjkuNTk2aDEuNjE1VjkuMjUxbDkuODUgMTIuNzI3Wm0tMy4zMzItOC41MzMgMS42IDIuMDYxVjcuMmgtMS42djYuMjQ1WiIvPjwvc3ZnPg==" alt="Next.js"><figcaption>รูปที่ 2.4&nbsp;&nbsp;Next.js</figcaption></figure>
+<h2>2.5 Redis และ Arq <span class="mk">mkr20mkr</span></h2>
+<p>Redis เป็นฐานข้อมูลแบบ in-memory ที่ทำงานได้รวดเร็ว ใช้สำหรับเก็บข้อมูลชั่วคราว (cache) และทำหน้าที่เป็นตัวกลางรับส่งข้อความ (message broker) ส่วน Arq เป็นตัวจัดคิวงาน (task queue) แบบ async ที่ทำงานร่วมกับ Redis ใช้รันงานเบื้องหลัง เช่น การหมดอายุของประกาศฉุกเฉินอัตโนมัติ การประมวลผลไฟล์สื่อ และคิวคำสั่งควบคุมทีวี</p>
+<figure><img class="figimg" src="data:image/svg+xml;base64,PHN2ZyBmaWxsPSIjRkY0NDM4IiByb2xlPSJpbWciIHZpZXdCb3g9IjAgMCAyNCAyNCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48dGl0bGU+UmVkaXM8L3RpdGxlPjxwYXRoIGQ9Ik0yMi43MSAxMy4xNDVjLTEuNjYgMi4wOTItMy40NTIgNC40ODMtNy4wMzggNC40ODMtMy4yMDMgMC00LjM5Ny0yLjgyNS00LjQ4LTUuMTIuNzAxIDEuNDg0IDIuMDczIDIuNjg1IDQuMjE0IDIuNjMgNC4xMTctLjEzMyA2Ljk0LTMuODUyIDYuOTQtNy4yMzkgMC00LjA1LTMuMDIyLTYuOTcyLTguMjY4LTYuOTcyLTMuNzUyIDAtOC40IDEuNDI4LTExLjQ1NSAzLjY4NUMyLjU5IDYuOTM3IDMuODg1IDkuOTU4IDQuMzUgOS42MjZjMi42NDgtMS45MDQgNC43NDgtMy4xMyA2Ljc4NC0zLjc0NEM4LjEyIDkuMjQ0Ljg4NiAxNy4wNSAwIDE4LjQyNWMuMSAxLjI2MSAxLjY2IDQuNjQ4IDIuNDI0IDQuNjQ4LjIzMiAwIC40MzEtLjEzMy42NjQtLjM2NWExMDAuNDkgMTAwLjQ5IDAgMCAwIDUuNTQtNi43NjVjLjIyMiAzLjEwNCAxLjc0OCA2Ljg5OCA2LjAxNCA2Ljg5OCAzLjgxOSAwIDcuNjA0LTIuNzU2IDkuMzMtOC45NjUuMi0uNzY0LS43My0xLjM2MS0xLjI2MS0uNzN6bS00LjM0OS01LjAxM2MwIDEuOTU5LTEuOTI2IDIuOTIyLTMuNjg1IDIuOTIyLS45NDEgMC0xLjY2NC0uMjQ3LTIuMjM1LS41NjggMS4wNTEtMS41OTIgMi4wOTItMy4yMjUgMy4yMS00Ljk3MyAxLjk3Mi4zMzQgMi43MSAxLjQzIDIuNzEgMi42MTl6Ii8+PC9zdmc+" alt="Redis"><figcaption>รูปที่ 2.5&nbsp;&nbsp;Redis</figcaption></figure>
+<h2>2.6 MinIO <span class="mk">mkr21mkr</span></h2>
+<p>MinIO เป็นระบบจัดเก็บไฟล์แบบ object storage ที่เข้ากันได้กับ Amazon S3 API สามารถติดตั้งใช้งานภายในองค์กรเองได้ ในระบบนี้ใช้ MinIO สำหรับจัดเก็บไฟล์สื่อ เช่น รูปภาพและวิดีโอ ที่ผู้ใช้อัปโหลดเข้ามา</p>
+<figure><img class="figimg" src="data:image/svg+xml;base64,PHN2ZyBmaWxsPSIjQzcyRTQ5IiByb2xlPSJpbWciIHZpZXdCb3g9IjAgMCAyNCAyNCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48dGl0bGU+TWluSU88L3RpdGxlPjxwYXRoIGQ9Ik0xMy4yMDcyLjAwNmMtLjYyMTYtLjA0NzgtMS4yLjE5NDMtMS42MjExLjU4MmEyLjE1IDIuMTUgMCAwIDAtLjA5MzggMy4wMzUybDMuNDA4MiAzLjU1MDdhMy4wNDIgMy4wNDIgMCAwIDEtLjY2NCA0LjY4NzVsLS40NjMuMjM4M1Y3LjI4NTNhMTUuNDE5OCAxNS40MTk4IDAgMCAwLTguMDE3NCAxMC40ODYydi4wMTc2bDYuNTQ4Ny0zLjMyODF2Ny42MjFMMTMuNzc5NCAyNFYxMy42ODE3bC44OTY1LS40NjI5YTQuNDQzMiA0LjQ0MzIgMCAwIDAgMS4yMjA3LTcuMDI5MmwtMy4zNzEtMy41MjU0YS43NDg5Ljc0ODkgMCAwIDEgLjAzNy0xLjA1NDcuNzUyMi43NTIyIDAgMCAxIDEuMDU2Ny4wMzcxbC40NjY4LjQ4NjMtLjAwNi4wMDU5IDQuMDcwNCA0LjI0NDFhLjA1NjYuMDU2NiAwIDAgMCAuMDgyIDAgLjA2LjA2IDAgMCAwIDAtLjA3MDNsLTMuMTQwNi01LjE0MjUtLjE0ODQuMTQyNS4xNDg0LS4xNDQ1QzE0LjQ5NDUuMzkyNiAxMy44Mjg3LjA1MzggMTMuMjA3Mi4wMDZabS0uOTAyNCA5Ljg2NTJ2Mi45OTQxbC00LjE1MjMgMi4xNDg0YTEzLjk3ODcgMTMuOTc4NyAwIDAgMSAyLjc2NzYtMy45Mjc3IDE0LjE3ODQgMTQuMTc4NCAwIDAgMSAxLjM4NDctMS4yMTQ4eiIvPjwvc3ZnPg==" alt="MinIO"><figcaption>รูปที่ 2.6&nbsp;&nbsp;MinIO</figcaption></figure>
+<h2>2.7 Docker และการทำคอนเทนเนอร์ (Containerization) <span class="mk">mkr22mkr</span></h2>
+<p>Docker เป็นเทคโนโลยีที่ช่วยบรรจุแอปพลิเคชันพร้อมสภาพแวดล้อมการทำงานไว้ในคอนเทนเนอร์ ทำให้ติดตั้งและทำงานได้เหมือนกันในทุกเครื่อง ระบบนี้ใช้ Docker Compose ในการจัดการบริการทั้งหมด (backend, worker, ฐานข้อมูล, Redis, MinIO, Admin UI) ให้ทำงานร่วมกัน ทำให้ติดตั้งระบบทั้งหมดได้ด้วยคำสั่งเดียว</p>
+<figure><img class="figimg" src="data:image/svg+xml;base64,PHN2ZyBmaWxsPSIjMjQ5NkVEIiByb2xlPSJpbWciIHZpZXdCb3g9IjAgMCAyNCAyNCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48dGl0bGU+RG9ja2VyPC90aXRsZT48cGF0aCBkPSJNMTMuOTgzIDExLjA3OGgyLjExOWEuMTg2LjE4NiAwIDAwLjE4Ni0uMTg1VjkuMDA2YS4xODYuMTg2IDAgMDAtLjE4Ni0uMTg2aC0yLjExOWEuMTg1LjE4NSAwIDAwLS4xODUuMTg1djEuODg4YzAgLjEwMi4wODMuMTg1LjE4NS4xODVtLTIuOTU0LTUuNDNoMi4xMThhLjE4Ni4xODYgMCAwMC4xODYtLjE4NlYzLjU3NGEuMTg2LjE4NiAwIDAwLS4xODYtLjE4NWgtMi4xMThhLjE4NS4xODUgMCAwMC0uMTg1LjE4NXYxLjg4OGMwIC4xMDIuMDgyLjE4NS4xODUuMTg1bTAgMi43MTZoMi4xMThhLjE4Ny4xODcgMCAwMC4xODYtLjE4NlY2LjI5YS4xODYuMTg2IDAgMDAtLjE4Ni0uMTg1aC0yLjExOGEuMTg1LjE4NSAwIDAwLS4xODUuMTg1djEuODg3YzAgLjEwMi4wODIuMTg1LjE4NS4xODZtLTIuOTMgMGgyLjEyYS4xODYuMTg2IDAgMDAuMTg0LS4xODZWNi4yOWEuMTg1LjE4NSAwIDAwLS4xODUtLjE4NUg4LjFhLjE4NS4xODUgMCAwMC0uMTg1LjE4NXYxLjg4N2MwIC4xMDIuMDgzLjE4NS4xODUuMTg2bS0yLjk2NCAwaDIuMTE5YS4xODYuMTg2IDAgMDAuMTg1LS4xODZWNi4yOWEuMTg1LjE4NSAwIDAwLS4xODUtLjE4NUg1LjEzNmEuMTg2LjE4NiAwIDAwLS4xODYuMTg1djEuODg3YzAgLjEwMi4wODQuMTg1LjE4Ni4xODZtNS44OTMgMi43MTVoMi4xMThhLjE4Ni4xODYgMCAwMC4xODYtLjE4NVY5LjAwNmEuMTg2LjE4NiAwIDAwLS4xODYtLjE4NmgtMi4xMThhLjE4NS4xODUgMCAwMC0uMTg1LjE4NXYxLjg4OGMwIC4xMDIuMDgyLjE4NS4xODUuMTg1bS0yLjkzIDBoMi4xMmEuMTg1LjE4NSAwIDAwLjE4NC0uMTg1VjkuMDA2YS4xODUuMTg1IDAgMDAtLjE4NC0uMTg2aC0yLjEyYS4xODUuMTg1IDAgMDAtLjE4NC4xODV2MS44ODhjMCAuMTAyLjA4My4xODUuMTg1LjE4NW0tMi45NjQgMGgyLjExOWEuMTg1LjE4NSAwIDAwLjE4NS0uMTg1VjkuMDA2YS4xODUuMTg1IDAgMDAtLjE4NC0uMTg2aC0yLjEyYS4xODYuMTg2IDAgMDAtLjE4Ni4xODZ2MS44ODdjMCAuMTAyLjA4NC4xODUuMTg2LjE4NW0tMi45MiAwaDIuMTJhLjE4NS4xODUgMCAwMC4xODQtLjE4NVY5LjAwNmEuMTg1LjE4NSAwIDAwLS4xODQtLjE4NmgtMi4xMmEuMTg1LjE4NSAwIDAwLS4xODQuMTg1djEuODg4YzAgLjEwMi4wODIuMTg1LjE4NS4xODVNMjMuNzYzIDkuODljLS4wNjUtLjA1MS0uNjcyLS41MS0xLjk1NC0uNTEtLjMzOC4wMDEtLjY3Ni4wMy0xLjAxLjA4Ny0uMjQ4LTEuNy0xLjY1My0yLjUzLTEuNzE2LTIuNTY2bC0uMzQ0LS4xOTktLjIyNi4zMjdjLS4yODQuNDM4LS40OS45MjItLjYxMiAxLjQzLS4yMy45Ny0uMDkgMS44ODIuNDAzIDIuNjYxLS41OTUuMzMyLTEuNTUuNDEzLTEuNzQ0LjQySC43NTFhLjc1MS43NTEgMCAwMC0uNzUuNzQ4IDExLjM3NiAxMS4zNzYgMCAwMC42OTIgNC4wNjJjLjU0NSAxLjQyOCAxLjM1NSAyLjQ4IDIuNDEgMy4xMjQgMS4xOC43MjMgMy4xIDEuMTM3IDUuMjc1IDEuMTM3Ljk4My4wMDMgMS45NjMtLjA4NiAyLjkzLS4yNjZhMTIuMjQ4IDEyLjI0OCAwIDAwMy44MjMtMS4zODljLjk4LS41NjcgMS44Ni0xLjI4OCAyLjYxLTIuMTM2IDEuMjUyLTEuNDE4IDEuOTk4LTIuOTk3IDIuNTUzLTQuNGguMjIxYzEuMzcyIDAgMi4yMTUtLjU0OSAyLjY4LTEuMDA5LjMwOS0uMjkzLjU1LS42NS43MDctMS4wNDZsLjA5OC0uMjg4WiIvPjwvc3ZnPg==" alt="Docker"><figcaption>รูปที่ 2.7&nbsp;&nbsp;Docker</figcaption></figure>
+<h2>2.8 HDMI-CEC และ RS-232 <span class="mk">mkr23mkr</span></h2>
+<p>HDMI-CEC (Consumer Electronics Control) เป็นโปรโตคอลที่ส่งคำสั่งควบคุมอุปกรณ์ผ่านสาย HDMI เช่น การสั่งเปิด-ปิดทีวี ส่วน RS-232 เป็นมาตรฐานการสื่อสารแบบ serial ที่ทีวีระดับองค์กรหลายยี่ห้อรองรับสำหรับการควบคุมจากระยะไกล ระบบนี้ใช้ทั้งสองโปรโตคอลในการสั่งเปิด/ปิด/เปลี่ยนช่องสัญญาณเข้าของทีวีหลายยี่ห้อ (เช่น Samsung MDC, LG, Sony)</p>
+<figure><div class="figph">[ ภาพประกอบ: HDMI-CEC และ RS-232 ]</div><figcaption>รูปที่ 2.8&nbsp;&nbsp;HDMI-CEC และ RS-232</figcaption></figure>
+<h2>2.9 ความปลอดภัยของระบบ (Security) <span class="mk">mkr24mkr</span></h2>
+<p>ระบบให้ความสำคัญกับความปลอดภัยหลายระดับ ได้แก่ การยืนยันตัวตนด้วย JWT (JSON Web Token) ร่วมกับระบบสิทธิ์ตามบทบาท (Role-Based Access Control: RBAC), การสแกนไวรัสไฟล์ที่อัปโหลดด้วย ClamAV, และการป้องกันการโจมตีแบบ SSRF (Server-Side Request Forgery) ด้วยการตรวจสอบ URL ที่ผู้ใช้ส่งเข้ามาไม่ให้ชี้เข้าสู่เครือข่ายภายใน</p>
+<figure><div class="figph">[ ภาพประกอบ: ความปลอดภัยของระบบ ]</div><figcaption>รูปที่ 2.9&nbsp;&nbsp;ความปลอดภัยของระบบ</figcaption></figure></section>
+<section class="chapter"><h1 class="cno">บทที่ 3 <span class="mk">mkr25mkr</span></h1><h1 class="cname">การวิเคราะห์และออกแบบระบบ</h1><p>ในบทนี้กล่าวถึงการวิเคราะห์ความต้องการของระบบ เครื่องมือที่ใช้ และการออกแบบระบบในด้านสถาปัตยกรรม ฐานข้อมูล และส่วนติดต่อโปรแกรม (API)</p>
+<h2>3.1 การวิเคราะห์ความต้องการของระบบ <span class="mk">mkr26mkr</span></h2>
+<p><strong>ความต้องการเชิงหน้าที่ (Functional Requirements):</strong></p>
+<ul>
+<li>จัดการเนื้อหาสื่อ (อัปโหลด/อนุมัติ/จัดหมวด)</li>
+<li>จัดผังการแสดงผลแบบหลายโซน (presentation/layout)</li>
+<li>กำหนดตารางการแสดงผลตามช่วงเวลาและกลุ่มจอ</li>
+<li>ควบคุมจอโทรทัศน์ระยะไกล (เปิด/ปิด/เปลี่ยนสัญญาณ)</li>
+<li>ประกาศเหตุฉุกเฉินที่แทรกตารางปกติได้ทันที</li>
+<li>จัดการผู้ใช้และสิทธิ์การเข้าถึง (RBAC)</li>
+<li>เฝ้าระวังสถานะอุปกรณ์และบันทึก audit log</li>
+</ul>
+<p><strong>ความต้องการที่ไม่ใช่เชิงหน้าที่ (Non-functional Requirements):</strong></p>
+<ul>
+<li>ความปลอดภัย (การยืนยันตัวตน สิทธิ์ และการตรวจสอบย้อนหลัง)</li>
+<li>ความทนทานต่อเครือข่ายขัดข้อง (offline-friendly ผ่าน manifest)</li>
+<li>ความง่ายในการติดตั้งและดูแล (Docker)</li>
+<li>ใช้เทคโนโลยี Open Source</li>
+</ul>
+<p>ระยะเวลาดำเนินงานแสดงด้วยแผนภูมิ Gantt <em>(รูปที่ 3.1) — [ ] ต้องจัดทำรูป Gantt</em></p>
+<h2>3.2 เครื่องมือที่ใช้ในการพัฒนา <span class="mk">mkr27mkr</span></h2>
+<h3>3.2.1 ฮาร์ดแวร์ (Hardware) <span class="mk">mkr28mkr</span></h3>
+<ul>
+<li>เครื่องคอมพิวเตอร์สำหรับพัฒนา (Developer PC)</li>
+<li>อุปกรณ์ทดสอบการแสดงผล: Android TV, แท็บเล็ต, Raspberry Pi, เครื่อง Windows</li>
+</ul>
+<h3>3.2.2 ซอฟต์แวร์ (Software) <span class="mk">mkr29mkr</span></h3>
+<ul>
+<li>ภาษา/เฟรมเวิร์ก: Python 3.12 + FastAPI, Node.js + Next.js + TypeScript</li>
+<li>ฐานข้อมูลและบริการ: PostgreSQL 16, Redis 7, MinIO</li>
+<li>เครื่องมือพัฒนา: Visual Studio Code, Git/GitHub, Docker</li>
+<li><em>(รายละเอียดครบทุกเครื่องมือดูที่ <code>tools-list.md</code>)</em></li>
+</ul>
+<h2>3.3 การออกแบบระบบ <span class="mk">mkr30mkr</span></h2>
+<h3>3.3.1 สถาปัตยกรรมระบบ (System Architecture) <span class="mk">mkr31mkr</span></h3>
+<p>ระบบประกอบด้วยส่วนหลัก 6 ส่วนที่ทำงานร่วมกันใน Docker stack ได้แก่ (1) Backend (FastAPI) ให้บริการ REST API และตรรกะทางธุรกิจ (2) Worker (Arq) สำหรับงานเบื้องหลัง (3) PostgreSQL ฐานข้อมูลหลัก (4) Redis สำหรับ cache และคิวงาน (5) MinIO สำหรับจัดเก็บไฟล์สื่อ และ (6) Admin UI (Next.js) สำหรับผู้ดูแล โดยส่วนแสดงผล (Player) จะดึงไฟล์ manifest จาก backend แล้วเล่นเนื้อหาแบบ offline-friendly <em>(รูปที่ 3.2)</em></p>
+<h3>3.3.2 การออกแบบฐานข้อมูล (ER Diagram) <span class="mk">mkr32mkr</span></h3>
+<p>ฐานข้อมูลประกอบด้วยตารางประมาณ 13 ตาราง (entity 12 ตาราง + ตารางความสัมพันธ์แบบ M:N) แบ่งเป็น 5 กลุ่ม ได้แก่ Identity &amp; Audit, Devices, Content &amp; Composition, Playlists &amp; Schedules และ Emergency <em>(รูปที่ 3.3 — มีไฟล์ ER diagram แล้ว)</em></p>
+<h3>3.3.3 แนวคิดลำดับชั้นเนื้อหาแบบ 5 ระดับ (5-Tier Content Hierarchy) <span class="mk">mkr33mkr</span></h3>
+<p>ระบบออกแบบลำดับชั้นเนื้อหาเป็น 5 ระดับ คือ Content (สื่อดิบ) → Zone (โซนแสดงผล) → Presentation (ผังการจัดวาง) → Plan (ลำดับการเล่น) → Schedule (เวลาและกลุ่มจอ) แนวคิดนี้ทำให้สามารถนำเนื้อหากลับมาใช้ซ้ำได้ และการแก้ไขตารางครั้งเดียวมีผลกับทั้งกลุ่มจอ</p>
+<h3>3.3.4 การออกแบบส่วนติดต่อโปรแกรม (API) <span class="mk">mkr34mkr</span></h3>
+<p>API เวอร์ชัน v1 มีทั้งหมดประมาณ 66 endpoints จัดเป็น 13 กลุ่ม (auth, users, devices, groups, contents, presentations, plans, schedules, player, tv, emergency, led, reports) ออกแบบตามแนวทาง REST ยืนยันตัวตนด้วย JWT และมีเอกสารอัตโนมัติแบบ OpenAPI (Swagger)</p>
+<h2>3.4 วิธีการพัฒนา <span class="mk">mkr35mkr</span></h2>
+<p>พัฒนาด้วยกระบวนการแบบวนซ้ำเป็นเฟส (iterative) ใช้ Git/GitHub ในการจัดการเวอร์ชันโค้ด มีระบบ Continuous Integration (GitHub Actions) สำหรับรันการทดสอบและตรวจสอบความปลอดภัยอัตโนมัติ และใช้ Docker เป็นสภาพแวดล้อมการพัฒนาที่สอดคล้องกับ production</p>
+<h2>3.5 การออกแบบการทดสอบ <span class="mk">mkr36mkr</span></h2>
+<p>ระบบใช้ pytest ร่วมกับ pytest-asyncio และ pytest-cov มีกรณีทดสอบประมาณ 133 กรณีใน 15 ไฟล์ ครอบคลุมการยืนยันตัวตน อุปกรณ์ กระบวนการจัดการเนื้อหา การควบคุมทีวี การประกาศฉุกเฉินและ audit, มิดเดิลแวร์ความปลอดภัย, รายงาน (reports), การควบคุม LED, การป้องกัน SSRF และงานเบื้องหลัง นอกจากนี้ยังมีการทดสอบแบบ End-to-End (smoke test) และระบบ CI ที่รันการทดสอบอัตโนมัติทุกครั้งที่มีการแก้ไขโค้ด</p></section>
+<section class="chapter"><h1 class="cno">บทที่ 4 <span class="mk">mkr37mkr</span></h1><h1 class="cname">ผลการดำเนินงาน</h1><p>ในบทนี้นำเสนอผลการพัฒนาระบบจัดการจอประชาสัมพันธ์ดิจิทัล ทั้งในส่วนความสามารถของแต่ละโมดูล หน้าจอการใช้งานจริง และส่วนแสดงผล</p>
+<h2>4.1 ภาพรวมระบบที่พัฒนา <span class="mk">mkr38mkr</span></h2>
+<p>ระบบได้รับการพัฒนาจนสามารถใช้งานได้ครบวงจร ประกอบด้วยส่วน backend (REST API), ส่วนจัดการสำหรับผู้ดูแล (Admin UI) และส่วนแสดงผล (Player) ทั้งบนเว็บและ Android รองรับกระบวนการทำงานตั้งแต่การอัปโหลดเนื้อหา → จัดผังการแสดงผล → ตั้งตารางเวลา → จอแสดงผลจริง → การประกาศเหตุฉุกเฉิน</p>
+<h2>4.2 โมดูลและความสามารถหลัก <span class="mk">mkr39mkr</span></h2>
+<table><thead><tr><th>โมดูล</th><th>ความสามารถ</th></tr></thead><tbody>
+<tr><td>Auth &amp; Users</td><td>ยืนยันตัวตนด้วย JWT + RBAC 7 บทบาท, ล็อกบัญชีเมื่อล็อกอินผิดซ้ำ, รองรับ cookie auth</td></tr>
+<tr><td>Devices</td><td>จับคู่อุปกรณ์ด้วยรหัส, heartbeat, telemetry (CPU/อุณหภูมิ/uptime), จัดกลุ่มจอแบบ M:N</td></tr>
+<tr><td>Contents</td><td>อัปโหลดสื่อ + ตรวจซ้ำด้วย sha256 + สร้าง thumbnail + กระบวนการอนุมัติ (draft→pending→approved/rejected)</td></tr>
+<tr><td>Presentations</td><td>จัดผัง layout หลายโซน (composer) ใน Admin UI</td></tr>
+<tr><td>Plans</td><td>จัดลำดับ presentation พร้อมกำหนดระยะเวลาแสดงผล</td></tr>
+<tr><td>Schedules</td><td>ผูก plan กับกลุ่มจอ + กฎเวลาแบบ RRULE (iCal) + ช่วงเวลารายวัน + ลำดับความสำคัญ + การอนุมัติ</td></tr>
+<tr><td>TV Control</td><td>สั่งเปิด/ปิด/เปลี่ยนสัญญาณผ่าน HDMI-CEC และ RS-232 หลายยี่ห้อ ผ่านคิวใน Redis</td></tr>
+<tr><td>LED Control</td><td>ควบคุมจอ LED ผ่านโมดูลควบคุมเฉพาะ <em>(ฟีเจอร์เพิ่มเติม)</em></td></tr>
+<tr><td>Emergency</td><td>ประกาศฉุกเฉิน override ทุกตาราง + หมดอายุอัตโนมัติ + ต้องการการยืนยันรับทราบ (ack)</td></tr>
+<tr><td>Reporting</td><td>บันทึกประวัติการเล่น (playback_logs) + สรุปรายงานและส่งออกข้อมูล <em>(ฟีเจอร์เพิ่มเติม)</em></td></tr>
+<tr><td>Monitoring</td><td>Prometheus metrics + readiness/liveness + audit log + Sentry + การสำรองข้อมูล</td></tr>
+<tr><td>Player</td><td>แสดงผลหลายโซน + วนเล่นตาม plan + overlay ประกาศฉุกเฉิน + cache แบบ offline</td></tr>
+</tbody></table>
+<h2>4.3 หน้าจอส่วนจัดการสำหรับผู้ดูแล (Admin UI) <span class="mk">mkr40mkr</span></h2>
+<p>ส่วนจัดการประกอบด้วยหน้าจอหลักหลายหน้า แสดงผลตัวอย่างดังนี้</p>
+<ul>
+<li>☐ รูปที่ 4.1 หน้าเข้าสู่ระบบ (Login)</li>
+<li>☐ รูปที่ 4.2 หน้าแดชบอร์ด (Dashboard)</li>
+<li>☐ รูปที่ 4.3 หน้าจัดการเนื้อหา (Contents)</li>
+<li>☐ รูปที่ 4.4 หน้าจัดผังการแสดงผล (Presentations / Composer)</li>
+<li>☐ รูปที่ 4.5 หน้าจัดลำดับ (Plans)</li>
+<li>☐ รูปที่ 4.6 หน้าจัดตารางเวลา (Schedules)</li>
+<li>☐ รูปที่ 4.7 หน้าจัดการอุปกรณ์และกลุ่มจอ (Devices)</li>
+<li>☐ รูปที่ 4.8 หน้าควบคุมทีวี/LED (TV/LED Control)</li>
+<li>☐ รูปที่ 4.9 หน้าประกาศฉุกเฉิน (Emergency)</li>
+<li>☐ รูปที่ 4.10 หน้ารายงานและการเฝ้าระวัง (Reports / Monitoring)</li>
+</ul>
+<h2>4.4 ส่วนแสดงผล (Player) <span class="mk">mkr41mkr</span></h2>
+<p>ส่วนแสดงผลทำหน้าที่ดึง manifest จาก backend แล้วแสดงเนื้อหาตามผังและตารางที่กำหนด รองรับการแสดงหลายโซนพร้อมกัน การวนเล่นตามลำดับ และการแสดง overlay เมื่อมีประกาศฉุกเฉิน รวมถึงการ cache เนื้อหาเพื่อให้เล่นต่อได้แม้เครือข่ายขัดข้อง</p>
+<ul>
+<li>☐ รูปที่ 4.11 ตัวอย่างการแสดงผลบนจอ (Player – normal)</li>
+<li>☐ รูปที่ 4.12 ตัวอย่างการแสดง overlay ประกาศฉุกเฉิน (Player – emergency)</li>
+</ul></section>
+<section class="chapter"><h1 class="cno">บทที่ 5 <span class="mk">mkr42mkr</span></h1><h1 class="cname">สรุปผลและข้อเสนอแนะ</h1><h2>5.1 สรุปผลการดำเนินงาน <span class="mk">mkr43mkr</span></h2>
+<p>โครงงานนี้ได้พัฒนาระบบจัดการจอประชาสัมพันธ์ดิจิทัล (Digital Signage Management System) จนสามารถใช้งานได้ครบวงจร ตั้งแต่การจัดการเนื้อหา การจัดผังการแสดงผล การกำหนดตารางเวลา การควบคุมจอโทรทัศน์และจอ LED ระยะไกล ไปจนถึงการประกาศเหตุฉุกเฉินและการเฝ้าระวังสถานะอุปกรณ์ ระบบทำงานบนสถาปัตยกรรม 6 ส่วนในรูปแบบคอนเทนเนอร์ มีส่วนจัดการสำหรับผู้ดูแล (Admin UI) และส่วนแสดงผล (Player) ทั้งบนเว็บและ Android ที่พร้อมใช้งานจริง โดยบรรลุวัตถุประสงค์ทั้งหมดที่ตั้งไว้ในบทที่ 1</p>
+<p>ในด้านคุณภาพ ระบบมีกรณีทดสอบอัตโนมัติประมาณ 133 กรณี ครอบคลุมส่วนสำคัญของระบบ และมีระบบ CI ตรวจสอบความถูกต้องและความปลอดภัยทุกครั้งที่แก้ไขโค้ด</p>
+<h2>5.2 ปัญหาที่พบและแนวทางแก้ไข <span class="mk">mkr44mkr</span></h2>
+<table><thead><tr><th>ปัญหาที่พบ</th><th>แนวทางแก้ไข</th></tr></thead><tbody>
+<tr><td>เครือข่ายภายในอาจขัดข้องชั่วคราว ทำให้จอหยุดแสดงผล</td><td>ออกแบบให้ player ดึง manifest แล้ว cache เนื้อหาไว้ เล่นต่อได้แบบ offline-friendly</td></tr>
+<tr><td>ทีวีมีหลายยี่ห้อ คำสั่งควบคุมต่างกัน</td><td>ออกแบบชั้นควบคุมแบบ enum protocol รองรับหลายยี่ห้อผ่าน HDMI-CEC และ RS-232</td></tr>
+<tr><td>ความเสี่ยงด้านความปลอดภัยจากไฟล์อัปโหลดและ URL ภายนอก</td><td>เพิ่มการสแกนไวรัสด้วย ClamAV และการป้องกัน SSRF ในการตรวจสอบ URL</td></tr>
+<tr><td>ต้องควบคุมสิทธิ์การเข้าถึงและตรวจสอบย้อนหลังได้</td><td>ใช้ระบบ RBAC 7 บทบาท ร่วมกับกระบวนการอนุมัติและการบันทึก audit log</td></tr>
+</tbody></table>
+<h2>5.3 ข้อเสนอแนะและการพัฒนาต่อยอด <span class="mk">mkr45mkr</span></h2>
+<p>แนวทางการพัฒนาต่อยอดในอนาคต (Phase 7) ได้แก่</p>
+<ol>
+<li>รองรับ HDMI-CEC แบบ native บนอุปกรณ์แสดงผลให้สมบูรณ์ยิ่งขึ้น</li>
+<li>เสริมความปลอดภัยของการยืนยันตัวตนด้วย httpOnly cookie</li>
+<li>รองรับหลายภาษา (i18n) ในส่วนจัดการ</li>
+<li>ขยายระบบ CI/CD ให้ครอบคลุมการ deploy อัตโนมัติ</li>
+<li>เพิ่มตารางข้อมูลแบบ time-series สำหรับ telemetry เพื่อวิเคราะห์แนวโน้มของอุปกรณ์</li>
+</ol>
+<h2>5.4 สิ่งที่ได้เรียนรู้จากการฝึกงาน <span class="mk">mkr46mkr</span></h2>
+<p><em>(เขียนจากประสบการณ์จริงของผู้จัดทำ — เช่น การออกแบบระบบจากความต้องการจริง การทำงานกับเทคโนโลยีหลายส่วนร่วมกัน การเขียนการทดสอบอัตโนมัติ การใช้ Docker และ Git ในการพัฒนาเป็นทีม ฯลฯ)</em> — [ ] เติมเนื้อหาส่วนตัว</p></section></body></html>
