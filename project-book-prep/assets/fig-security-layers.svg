@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 340" font-family="'Angsana New','Leelawadee UI',sans-serif">
+  <g stroke="#333" stroke-width="2">
+    <rect x="55"  y="45"  width="330" height="110" rx="8" fill="#f2f2f2"/>
+    <rect x="415" y="45"  width="330" height="110" rx="8" fill="#f2f2f2"/>
+    <rect x="55"  y="185" width="330" height="110" rx="8" fill="#f2f2f2"/>
+    <rect x="415" y="185" width="330" height="110" rx="8" fill="#f2f2f2"/>
+  </g>
+  <text x="220" y="92"  text-anchor="middle" font-size="25" font-weight="bold">JWT + RBAC</text>
+  <text x="220" y="124" text-anchor="middle" font-size="20">ยืนยันตัวตนและจำกัดสิทธิ์ตามบทบาท 7 ระดับ</text>
+  <text x="580" y="92"  text-anchor="middle" font-size="25" font-weight="bold">กระบวนการอนุมัติ</text>
+  <text x="580" y="124" text-anchor="middle" font-size="20">เนื้อหา/ตารางต้องผ่านการอนุมัติก่อนเผยแพร่</text>
+  <text x="220" y="232" text-anchor="middle" font-size="25" font-weight="bold">ClamAV</text>
+  <text x="220" y="264" text-anchor="middle" font-size="20">สแกนไวรัสไฟล์สื่อทุกไฟล์ที่อัปโหลด</text>
+  <text x="580" y="232" text-anchor="middle" font-size="25" font-weight="bold">SSRF Guard + Audit Log</text>
+  <text x="580" y="264" text-anchor="middle" font-size="20">ตรวจสอบ URL ภายนอก และบันทึกทุกการกระทำ</text>
+</svg>

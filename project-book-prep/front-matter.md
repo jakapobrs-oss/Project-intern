@@ -10,8 +10,8 @@
 |---|---|
 | ชื่อเรื่อง (ไทย) | การพัฒนาระบบจัดการจอประชาสัมพันธ์ดิจิทัล *(ปรับได้)* |
 | ชื่อเรื่อง (อังกฤษ) | Development of a Digital Signage Management System *(ปรับได้)* |
-| ชื่อ-สกุลผู้จัดทำ | [ชื่อนักศึกษา] |
-| รหัสนักศึกษา | [รหัส] |
+| ผู้จัดทำคนที่ 1 (Backend) | [ชื่อ-สกุล] รหัส [รหัสนักศึกษา] |
+| ผู้จัดทำคนที่ 2 (Frontend) | [ชื่อ-สกุล] รหัส [รหัสนักศึกษา] |
 | สาขาวิชา | [สาขา เช่น วิทยาการคอมพิวเตอร์] |
 | คณะ/สถาบัน | [คณะ / มหาวิทยาลัย] |
 | สถานประกอบการที่ฝึกงาน | [หน่วยงาน — เช่น โรงพยาบาล/คณะฯ] |
@@ -20,10 +20,11 @@
 
 ---
 
-## หน้าอนุมัติ (Approval Page)
-- อาจารย์ที่ปรึกษา: ............................................... ( [ชื่อ] )
-- กรรมการ: ............................................... ( [ชื่อ] )
-- หัวหน้าสาขา/ผู้ลงนาม: ............................................... ( [ชื่อ] )
+## หน้าอนุมัติ (Approval Page) — โครงตามเล่มตัวอย่างเดชธนา
+- คณะกรรมการสอบปริญญานิพนธ์:
+  - ............................ ที่ปรึกษาและกรรมการ ( [ที่ปรึกษาสถานประกอบการ] )
+  - ............................ อาจารย์ที่ปรึกษาและกรรมการ ( [อาจารย์ที่ปรึกษา] )
+  - ............................ ( [หัวหน้าสาขาวิชา] ) หัวหน้าสาขาวิชา[สาขา] + วันที่ ... เดือน ... พ.ศ. ...
 
 ---
 
@@ -31,7 +32,7 @@
 
 ระบบจัดการจอประชาสัมพันธ์ดิจิทัล (Digital Signage Management System) พัฒนาขึ้นเพื่อแก้ปัญหาการบริหารจัดการจอประชาสัมพันธ์หลายจุดในองค์กรที่เดิมต้องอัปเดตเนื้อหาและควบคุมจอด้วยมือทีละเครื่อง โดยรวมการจัดการเนื้อหา การจัดผังการแสดงผล การกำหนดตารางเวลาออกอากาศ การควบคุมจอโทรทัศน์และจอ LED ระยะไกลผ่านโปรโตคอล HDMI-CEC และ RS-232 ตลอดจนการประกาศเหตุฉุกเฉิน ไว้ในระบบกลางเพียงระบบเดียว
 
-ระบบพัฒนาด้วยสถาปัตยกรรมแบบบริการหลายส่วน (FastAPI, PostgreSQL, Redis, MinIO และ Next.js) ทำงานในรูปแบบคอนเทนเนอร์ด้วย Docker มีระบบสิทธิ์ผู้ใช้แบบ RBAC กระบวนการอนุมัติเนื้อหา การบันทึกประวัติการใช้งาน และการเฝ้าระวังสถานะอุปกรณ์ ส่วนแสดงผลรองรับการทำงานแบบ offline-friendly ผ่านไฟล์ manifest ผลการพัฒนาได้ระบบที่ใช้งานได้ครบวงจรตั้งแต่การอัปโหลดเนื้อหาจนถึงการแสดงผลบนจอจริง พร้อมการทดสอบอัตโนมัติประมาณ 133 กรณี
+ระบบพัฒนาด้วยสถาปัตยกรรมแบบบริการหลายส่วน (FastAPI, PostgreSQL, Redis, MinIO และ Next.js) ทำงานในรูปแบบคอนเทนเนอร์ด้วย Docker มีระบบสิทธิ์ผู้ใช้แบบ RBAC กระบวนการอนุมัติเนื้อหา การบันทึกประวัติการใช้งาน และการเฝ้าระวังสถานะอุปกรณ์ ส่วนแสดงผลรองรับการทำงานแบบ offline-friendly ผ่านไฟล์ manifest ผลการพัฒนาได้ระบบที่ใช้งานได้ครบวงจรตั้งแต่การอัปโหลดเนื้อหาจนถึงการแสดงผลบนจอจริง พร้อมการทดสอบอัตโนมัติ 142 กรณี
 
 **คำสำคัญ:** ป้ายประชาสัมพันธ์ดิจิทัล, การจัดการเนื้อหา, การควบคุมทีวีระยะไกล, HDMI-CEC, RS-232, FastAPI
 
@@ -43,7 +44,7 @@
 
 The Digital Signage Management System was developed to address the challenge of managing multiple public-display screens within an organization, which previously required manual content updates and screen control on a per-device basis. The system consolidates content management, layout composition, broadcast scheduling, remote control of televisions and LED displays via HDMI-CEC and RS-232 protocols, and emergency announcements into a single centralized platform.
 
-Built on a multi-service architecture (FastAPI, PostgreSQL, Redis, MinIO, and Next.js) running in Docker containers, the system provides role-based access control (RBAC), a content approval workflow, audit logging, and device monitoring. The player component supports offline-friendly operation through manifest files. The result is a fully functional system covering the workflow from content upload to live on-screen display, accompanied by approximately 133 automated test cases.
+Built on a multi-service architecture (FastAPI, PostgreSQL, Redis, MinIO, and Next.js) running in Docker containers, the system provides role-based access control (RBAC), a content approval workflow, audit logging, and device monitoring. The player component supports offline-friendly operation through manifest files. The result is a fully functional system covering the workflow from content upload to live on-screen display, accompanied by 142 automated test cases.
 
 **Keywords:** Digital Signage, Content Management, Remote TV Control, HDMI-CEC, RS-232, FastAPI
 

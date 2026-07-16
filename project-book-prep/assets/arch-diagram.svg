@@ -1,0 +1,68 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 940 640" font-family="'Angsana New','Leelawadee UI',sans-serif">
+  <defs>
+    <marker id="ar" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto">
+      <path d="M0,0 L10,4 L0,8 z" fill="#333"/>
+    </marker>
+  </defs>
+
+  <!-- ผู้ดูแลระบบ -->
+  <rect x="45" y="30" width="170" height="60" rx="8" fill="#fff" stroke="#333" stroke-width="2"/>
+  <text x="130" y="67" text-anchor="middle" font-size="23" font-weight="bold">ผู้ดูแลระบบ</text>
+  <line x1="130" y1="90" x2="160" y2="158" stroke="#333" stroke-width="2" marker-end="url(#ar)"/>
+  <text x="66" y="130" font-size="19">เว็บเบราว์เซอร์</text>
+
+  <!-- กรอบ Docker -->
+  <rect x="40" y="162" width="590" height="440" rx="12" fill="none" stroke="#666" stroke-width="2" stroke-dasharray="9 6"/>
+  <text x="58" y="590" font-size="21" fill="#555" font-weight="bold">Docker Compose (ติดตั้งภายในองค์กร)</text>
+
+  <!-- Admin UI -->
+  <rect x="70" y="188" width="200" height="70" rx="8" fill="#f2f2f2" stroke="#333" stroke-width="2"/>
+  <text x="170" y="218" text-anchor="middle" font-size="23" font-weight="bold">Admin UI</text>
+  <text x="170" y="244" text-anchor="middle" font-size="20">(Next.js)</text>
+
+  <!-- Backend -->
+  <rect x="350" y="184" width="240" height="80" rx="8" fill="#e8e8e8" stroke="#333" stroke-width="2.5"/>
+  <text x="470" y="216" text-anchor="middle" font-size="24" font-weight="bold">Backend (FastAPI)</text>
+  <text x="470" y="244" text-anchor="middle" font-size="20">REST API + ตรรกะทางธุรกิจ</text>
+  <line x1="270" y1="224" x2="346" y2="224" stroke="#333" stroke-width="2" marker-end="url(#ar)"/>
+  <text x="308" y="212" text-anchor="middle" font-size="19">REST API</text>
+
+  <!-- แถวบริการข้อมูล -->
+  <rect x="70" y="330" width="170" height="70" rx="8" fill="#f2f2f2" stroke="#333" stroke-width="2"/>
+  <text x="155" y="360" text-anchor="middle" font-size="22" font-weight="bold">PostgreSQL</text>
+  <text x="155" y="386" text-anchor="middle" font-size="19">ฐานข้อมูลหลัก</text>
+
+  <rect x="270" y="330" width="150" height="70" rx="8" fill="#f2f2f2" stroke="#333" stroke-width="2"/>
+  <text x="345" y="360" text-anchor="middle" font-size="22" font-weight="bold">Redis</text>
+  <text x="345" y="386" text-anchor="middle" font-size="19">cache + คิวงาน</text>
+
+  <rect x="450" y="330" width="150" height="70" rx="8" fill="#f2f2f2" stroke="#333" stroke-width="2"/>
+  <text x="525" y="360" text-anchor="middle" font-size="22" font-weight="bold">MinIO</text>
+  <text x="525" y="386" text-anchor="middle" font-size="19">จัดเก็บไฟล์สื่อ</text>
+
+  <line x1="400" y1="264" x2="170" y2="326" stroke="#333" stroke-width="2" marker-end="url(#ar)"/>
+  <line x1="460" y1="264" x2="352" y2="326" stroke="#333" stroke-width="2" marker-end="url(#ar)"/>
+  <line x1="510" y1="264" x2="522" y2="326" stroke="#333" stroke-width="2" marker-end="url(#ar)"/>
+
+  <!-- Worker -->
+  <rect x="270" y="470" width="180" height="70" rx="8" fill="#f2f2f2" stroke="#333" stroke-width="2"/>
+  <text x="360" y="500" text-anchor="middle" font-size="22" font-weight="bold">Worker (Arq)</text>
+  <text x="360" y="526" text-anchor="middle" font-size="19">งานเบื้องหลัง</text>
+  <line x1="345" y1="400" x2="352" y2="466" stroke="#333" stroke-width="2" marker-end="url(#ar)"/>
+  <text x="290" y="438" font-size="19">คิวงาน</text>
+
+  <!-- Player -->
+  <rect x="700" y="250" width="200" height="80" rx="8" fill="#f2f2f2" stroke="#333" stroke-width="2"/>
+  <text x="800" y="282" text-anchor="middle" font-size="23" font-weight="bold">Player</text>
+  <text x="800" y="310" text-anchor="middle" font-size="20">(จอแสดงผล Android/เว็บ)</text>
+  <path d="M590,210 L660,210 L660,286 L696,286" fill="none" stroke="#333" stroke-width="2" marker-end="url(#ar)"/>
+  <text x="668" y="196" text-anchor="middle" font-size="19">manifest /</text>
+  <text x="668" y="218" text-anchor="middle" font-size="19" dy="20">คำสั่งควบคุม</text>
+
+  <!-- จอโทรทัศน์ -->
+  <rect x="700" y="470" width="200" height="70" rx="8" fill="#fff" stroke="#333" stroke-width="2"/>
+  <text x="800" y="500" text-anchor="middle" font-size="22" font-weight="bold">จอโทรทัศน์ / จอ LED</text>
+  <text x="800" y="526" text-anchor="middle" font-size="19">อุปกรณ์แสดงผลปลายทาง</text>
+  <line x1="800" y1="330" x2="800" y2="466" stroke="#333" stroke-width="2" marker-end="url(#ar)"/>
+  <text x="806" y="404" font-size="19">HDMI-CEC / RS-232</text>
+</svg>
