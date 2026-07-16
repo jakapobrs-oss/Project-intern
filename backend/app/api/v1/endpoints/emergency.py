@@ -25,6 +25,10 @@ router = APIRouter()
 MUTATE_ROLES = (Role.SUPER_ADMIN, Role.ADMIN, Role.OPERATOR)
 
 
+# ลงทะเบียนทั้ง "" และ "/" — กัน redirect chain ผ่าน Next proxy:
+# /emergency (ไม่มี slash) เคยโดน FastAPI 307 ไป http://backend:8000/... ซึ่ง browser
+# resolve ไม่ได้ (hostname ภายใน Docker) ส่วนฟอร์มมี slash ก็โดน Next ตัด slash (308) ก่อนถึง backend
+@router.get("", response_model=list[EmergencyOut], include_in_schema=False)
 @router.get("/", response_model=list[EmergencyOut])
 async def list_broadcasts(
     status_filter: EmergencyStatus | None = None,
@@ -39,6 +43,7 @@ async def list_broadcasts(
     return rows
 
 
+@router.post("", response_model=EmergencyOut, status_code=status.HTTP_201_CREATED, include_in_schema=False)
 @router.post("/", response_model=EmergencyOut, status_code=status.HTTP_201_CREATED)
 async def create_broadcast(
     body: EmergencyCreate,
