@@ -33,7 +33,7 @@
 
 **Q: "manifest pattern" คืออะไร ทำไมไม่ query realtime?** (BE) ⭐ ถามบ่อย
 > backend คำนวณ **JSON ตารางเล่นต่อเครื่องไว้ล่วงหน้า** player แค่ดึงไปเล่น
-> ข้อดี: (1) player ทำงานง่าย/เบา (2) **ทำงานต่อได้ตอนเน็ตหลุด** (cache ไว้) (3) ลดโหลด DB (ไม่ต้อง query ทุก request) — ยืมแนวจากระบบ RAMA เดิม (Script Agent)
+> ข้อดี: (1) player ทำงานง่าย/เบา (2) **ทำงานต่อได้ตอนเน็ตหลุด** (cache ไว้) (3) ลดโหลด DB (ไม่ต้อง query ทุก request) — ยืมแนวจากระบบเดิม (Script Agent)
 
 **Q: hierarchy 5 ชั้นคืออะไร?** (BE)
 > Content → Presentation (จัด layout/zone) → Plan (playlist) → PlayerGroup → Player — ยืดหยุ่นกว่า playlist ตรงๆ เช่นแก้ presentation ครั้งเดียว มีผลทุกจอในกลุ่ม
