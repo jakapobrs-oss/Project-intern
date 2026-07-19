@@ -95,7 +95,7 @@
 > ตอบตรงไปตรงมา: "ใช้เครื่องมือช่วย implement บางส่วน แต่ **สถาปัตยกรรม การตัดสินใจเลือก pattern การทดสอบ และการ debug เราทำเองและเข้าใจทุกส่วน**" แล้วพิสูจน์ด้วยการตอบคำถามเชิงลึกได้ (นั่นคือเหตุผลที่ต้องอ่านไฟล์นี้ + รู้จริง) — ความเข้าใจสำคัญกว่าใครพิมพ์
 
 **Q: ความใหม่/สิ่งที่ทำเองคืออะไร (ไม่ใช่แค่ลอก)?** (BE)
-> modernize ระบบ RAMA เดิม (C#/.NET/Windows-only) → **stack ใหม่ Python/FastAPI/Docker ข้าม OS**, รวม TV control หลายยี่ห้อเป็น API เดียว, manifest pattern + 5-tier hierarchy, ออกแบบ security ครบ (PDPA/SSRF/RBAC)
+> modernize ระบบเดิม (C#/.NET/Windows-only) → **stack ใหม่ Python/FastAPI/Docker ข้าม OS**, รวม TV control หลายยี่ห้อเป็น API เดียว, manifest pattern + 5-tier hierarchy, ออกแบบ security ครบ (PDPA/SSRF/RBAC)
 
 **Q: ทำไมไม่ใช้ของสำเร็จรูป (Xibo/Yodeck)?** (ทั้งคู่)
 > (1) เรียนรู้ทำเอง = วัตถุประสงค์ฝึกงาน (2) customize ให้เข้ากับระบบ รพ. ได้ (3) ไม่มีค่า license/ผูก vendor (4) คุม data on-premise (PDPA ผู้ป่วย)

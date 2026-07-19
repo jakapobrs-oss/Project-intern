@@ -33,7 +33,7 @@
 ## รอบ 2 — ท้าทุกการตัดสินใจ
 
 **G4.** "ทำไมไม่ใช้ WebSocket/MQTT push? polling เปลืองเปล่า"
-- ทิศ: trade-off — polling ง่าย/firewall-friendly/player ทน, 10-20 จอ overhead ต่ำ; MQTT เพิ่ม broker+ซับซ้อน; ระบบ RAMA เดิมก็ poll
+- ทิศ: trade-off — polling ง่าย/firewall-friendly/player ทน, 10-20 จอ overhead ต่ำ; MQTT เพิ่ม broker+ซับซ้อน; ระบบเดิมก็ poll
 - 🪤 "พันจอล่ะ?" → ค่อยใส่ MQTT (roadmap), manifest pre-computed รองรับ push ได้ไม่ต้องรื้อ
 
 **G5.** "ทำไม Postgres ไม่ใช่ MySQL ที่ รพ.อาจมีอยู่แล้ว?"
