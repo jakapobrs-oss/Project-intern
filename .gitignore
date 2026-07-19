@@ -72,9 +72,9 @@ signage_dev.db
 *.db
 messageImage_*.jpg
 
-# ===== reference repos แยก (ไม่เกี่ยวกับ project นี้ — เก็บ local เท่านั้น) =====
-RAMA_ANDROID_TV/
-RAMA_SIGNAGE_WEB_SERVER/
+# ===== ไฟล์อ้างอิงรูปแบบเล่ม (เก็บ local เท่านั้น ไม่ track) =====
+/รูปเล่ม*.pdf
+/project-book-prep/example-pages/
 
 # ===== planning / working docs (เก็บ local เท่านั้น ไม่ push) =====
 PLAN.md
