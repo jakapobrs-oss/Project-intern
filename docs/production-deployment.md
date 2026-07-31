@@ -46,6 +46,7 @@
 - [ ] Docker Compose v2+ + Docker engine 24+
 - [ ] HTTPS cert (Let's Encrypt หรือ commercial)
 - [ ] `.env` มี secrets ทั้งหมด **ไม่ใช้ค่า default**
+- [ ] `TRUSTED_PROXIES` ตั้งเป็นวง IP ของ nginx (เช่น `172.16.0.0/12` สำหรับ docker network) — ไม่ตั้ง = audit log จะบันทึก IP ของ nginx แทน IP ผู้ใช้จริง
 - [ ] Off-site backup destination (B2, S3, restic repo) เตรียมไว้
 - [ ] Monitoring endpoint (Prometheus / healthchecks.io) เตรียม
 - [ ] Sentry DSN (optional แต่แนะนำ)
@@ -361,6 +362,26 @@ docker compose logs backend | tail -50
 docker compose exec backend alembic upgrade head
 docker compose exec backend alembic current
 ```
+
+### audit log บันทึก IP เป็น 172.x ไม่ใช่ IP ผู้ใช้
+
+ไล่ตามลำดับนี้:
+
+1. **รันแบบ dev (ไม่มี nginx) เห็น 172.x = ปกติ ไม่ใช่บั๊ก** — Docker เปลี่ยน IP ต้นทาง
+   ตอน forward พอร์ตให้ ไม่มีทางรู้ IP จริงได้จากฝั่งแอป
+2. **รันจริงหลัง nginx แล้วยังเป็น 172.x** → ยังไม่ได้ตั้ง `TRUSTED_PROXIES`
+   ระบบจึงไม่เชื่อ `X-Forwarded-For` แล้วใช้ IP ของ nginx แทน:
+   ```bash
+   # หา IP/subnet ของ nginx ใน docker network
+   docker compose exec backend getent hosts nginx
+   # ตั้งใน .env แล้ว restart backend
+   TRUSTED_PROXIES=172.16.0.0/12
+   ```
+3. ตรวจว่า nginx ส่ง header จริง — `nginx/signage.conf` ต้องมี
+   `proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;` (มีให้แล้ว)
+
+> ทำไมไม่เชื่อ header ไปเลย: `X-Forwarded-For` เป็นค่าที่ผู้ใช้แนบมาเองได้
+> ถ้าเชื่อทุกกรณี ใครก็ทำให้ audit บันทึก IP ผิดคนได้ — log ที่เก็บไว้สืบสวนจะใช้ไม่ได้
 
 ### `admin-ui: Application error`
 ```bash

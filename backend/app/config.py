@@ -60,6 +60,13 @@ class Settings(BaseSettings):
     sentry_traces_sample_rate: float = 0.0   # 0.0 = ไม่ส่ง performance trace
     sentry_environment: str = ""              # ใช้ app_env ถ้าไม่ระบุ
 
+    # ===== Trusted proxy (§31 audit) =====
+    # รายการ IP/ช่วง IP ของ reverse proxy ที่เชื่อถือได้ คั่นด้วยจุลภาค เช่น "172.16.0.0/12"
+    # มีผลกับ IP ที่บันทึกลง audit เท่านั้น: เชื่อ header X-Forwarded-For เฉพาะเมื่อผู้ที่
+    # ต่อเข้ามาโดยตรงอยู่ในรายการนี้ — ว่างไว้ = ไม่เชื่อ header เลย ใช้ IP ที่ต่อเข้ามาตรง ๆ
+    # (ถ้าเชื่อทุกคน ใครก็แนบ X-Forwarded-For ปลอมให้ audit บันทึก IP ผิดคนได้)
+    trusted_proxies: str = ""
+
     # ===== Account lockout (§26) — ชั้นที่ 2 ถัดจาก rate limit =====
     # กรอกรหัสผิดครบ max_failed_login ครั้ง → ล็อกชั่วคราว lockout_minutes นาที แล้วปลดเอง
     # ตั้งใจให้ "ชั่วคราว" ไม่ใช่ถาวร เพราะล็อกถาวรเปิดช่องให้ใครก็ได้ที่รู้ชื่อผู้ใช้

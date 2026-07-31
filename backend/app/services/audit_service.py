@@ -16,6 +16,7 @@ from fastapi import Request
 from loguru import logger
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.core.client_ip import client_ip
 from app.models.audit import AuditLog, AuditOutcome
 from app.models.user import User
 
@@ -165,15 +166,15 @@ async def log_action(
 
 
 def extract_request_context(request) -> dict[str, str | None]:
-    """ดึง ip + user-agent จาก FastAPI Request (เรียกจาก endpoint)"""
+    """
+    ดึง ip + user-agent จาก FastAPI Request (เรียกจาก endpoint)
+
+    IP คิดผ่าน core/client_ip.py ซึ่งเชื่อ X-Forwarded-For เฉพาะเมื่อมาจาก proxy
+    ที่ตั้งไว้ว่าเชื่อถือได้ — ของเดิมเชื่อ header ดื้อ ๆ จึงถูกปลอมได้
+    """
     if request is None:
         return {"ip_address": None, "user_agent": None}
-    # respect X-Forwarded-For (proxy/load-balancer)
-    fwd = request.headers.get("x-forwarded-for")
-    ip = (fwd.split(",")[0].strip() if fwd else None) or (
-        request.client.host if request.client else None
-    )
     return {
-        "ip_address": ip,
+        "ip_address": client_ip(request),
         "user_agent": request.headers.get("user-agent"),
     }
