@@ -42,6 +42,7 @@ erDiagram
         bool is_active
         bool is_locked
         int failed_login_count
+        datetime locked_until "ล็อกชั่วคราวถึงเมื่อไหร่ (null = ไม่ถูกล็อก)"
         datetime created_at
         datetime updated_at
         datetime last_login_at

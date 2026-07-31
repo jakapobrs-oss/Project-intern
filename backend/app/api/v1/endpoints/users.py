@@ -82,8 +82,13 @@ async def update_user(
     data = payload.model_dump(exclude_unset=True)
     if "password" in data and data["password"]:
         user.password_hash = hash_password(data.pop("password"))
-        # password เปลี่ยน → ปลดล็อก + reset counter
+        # password เปลี่ยน → ปลดล็อกทุกชนิด + reset counter
         user.is_locked = False
+        user.locked_until = None
+        user.failed_login_count = 0
+    # admin กดปลดล็อก → ต้องล้างล็อกชั่วคราวด้วย ไม่งั้นปลดแล้วยังเข้าไม่ได้จนกว่าจะครบเวลา
+    if data.get("is_locked") is False:
+        user.locked_until = None
         user.failed_login_count = 0
     for k, v in data.items():
         setattr(user, k, v)

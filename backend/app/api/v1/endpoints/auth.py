@@ -83,7 +83,8 @@ def _auth_error_to_http(e: AuthError) -> HTTPException:
     code_to_status = {
         "INVALID_CREDENTIALS": status.HTTP_401_UNAUTHORIZED,
         "ACCOUNT_DISABLED": status.HTTP_403_FORBIDDEN,
-        "ACCOUNT_LOCKED": status.HTTP_403_FORBIDDEN,
+        "ACCOUNT_LOCKED": status.HTTP_403_FORBIDDEN,        # admin ล็อกด้วยมือ
+        "ACCOUNT_LOCKED_TEMP": status.HTTP_403_FORBIDDEN,   # ระบบล็อกชั่วคราว รอครบเวลาแล้วปลดเอง
         "INVALID_TOKEN": status.HTTP_401_UNAUTHORIZED,
     }
     return HTTPException(

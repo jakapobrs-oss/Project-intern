@@ -43,8 +43,13 @@ class User(Base):
 
     # สถานะ
     is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
+    # is_locked = admin สั่งล็อกด้วยมือ → บล็อกทุกอย่างจนกว่าคนจะมาปลด (รวม session ที่ล็อกอินค้างอยู่)
     is_locked: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)  # §26 account lockout
     failed_login_count: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
+    # locked_until = ระบบล็อกชั่วคราวเองเพราะกรอกรหัสผิดเกินกำหนด → ปลดเองเมื่อถึงเวลา
+    # แยกจาก is_locked โดยตั้งใจ: ล็อกชั่วคราวบล็อกเฉพาะ "การล็อกอินใหม่" ไม่ตัด session ที่ทำงานอยู่
+    # (ไม่งั้นคนร้ายกรอกรหัสผิดใส่ชื่อเราไม่กี่ครั้ง ก็เตะเราออกจากระบบกลางคันได้)
+    locked_until: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
 
     # Timestamps
     created_at: Mapped[datetime] = mapped_column(

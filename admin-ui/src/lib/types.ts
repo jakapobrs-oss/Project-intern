@@ -17,7 +17,10 @@ export interface User {
   full_name: string;
   role: Role;
   is_active: boolean;
+  /** admin สั่งล็อกด้วยมือ — ปลดได้ด้วยคนเท่านั้น */
   is_locked: boolean;
+  /** ระบบล็อกชั่วคราวเพราะกรอกรหัสผิดเกินกำหนด — ถึงเวลานี้แล้วปลดเอง (null = ไม่ได้ถูกล็อก) */
+  locked_until: string | null;
   created_at: string;
   updated_at: string;
   last_login_at: string | null;

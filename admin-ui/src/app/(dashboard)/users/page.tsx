@@ -26,6 +26,16 @@ import { useToast } from "@/components/toast";
 
 const ROLES: Role[] = ["super_admin", "admin", "editor", "approver", "viewer", "operator"];
 
+/** ถูกระบบล็อกชั่วคราวจากการกรอกรหัสผิด และยังไม่ถึงเวลาปลด */
+function isTempLocked(u: User): boolean {
+  return !!u.locked_until && new Date(u.locked_until) > new Date();
+}
+
+/** ถูกล็อกอยู่จริงหรือไม่ — นับทั้งแบบ admin สั่งล็อก และแบบระบบล็อกชั่วคราว */
+function isLocked(u: User): boolean {
+  return u.is_locked || isTempLocked(u);
+}
+
 export default function UsersPage() {
   const toast = useToast();
   const [users, setUsers] = useState<User[] | null>(null);
@@ -46,12 +56,15 @@ export default function UsersPage() {
   }, []);
 
   const handleToggleLock = async (u: User) => {
+    // ถูกล็อกอยู่ (แบบไหนก็ตาม) → ปุ่มนี้คือ "ปลด"; ยังไม่ถูกล็อก → ปุ่มนี้คือ "ล็อก"
+    // ส่ง is_locked=false ฝั่ง backend จะล้าง locked_until ให้ด้วย (ไม่งั้นปลดแล้วยังเข้าไม่ได้)
+    const nextLocked = !isLocked(u);
     try {
       const updated = await api.patch<User>(`/users/${u.id}`, {
-        is_locked: !u.is_locked,
+        is_locked: nextLocked,
       });
       setUsers((prev) => prev?.map((x) => (x.id === u.id ? updated : x)) ?? null);
-      toast.success(updated.is_locked ? `ล็อก ${u.username}` : `ปลดล็อก ${u.username}`);
+      toast.success(nextLocked ? `ล็อก ${u.username}` : `ปลดล็อก ${u.username}`);
     } catch (e) {
       toast.error("อัปเดตไม่สำเร็จ", e instanceof ApiError ? e.message : undefined);
     }
@@ -110,6 +123,14 @@ export default function UsersPage() {
                 <TD>
                   {u.is_locked ? (
                     <StatusBadge status="error" />
+                  ) : isTempLocked(u) ? (
+                    <Badge variant="warn">
+                      ล็อกชั่วคราวถึง{" "}
+                      {new Date(u.locked_until!).toLocaleTimeString("th-TH", {
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })}
+                    </Badge>
                   ) : u.is_active ? (
                     <StatusBadge status="active" />
                   ) : (
@@ -121,7 +142,7 @@ export default function UsersPage() {
                 </TD>
                 <TD className="text-right">
                   <Button size="sm" variant="ghost" onClick={() => handleToggleLock(u)}>
-                    {u.is_locked ? (
+                    {isLocked(u) ? (
                       <><Unlock className="h-3.5 w-3.5" /> ปลดล็อก</>
                     ) : (
                       <><Lock className="h-3.5 w-3.5" /> ล็อก</>

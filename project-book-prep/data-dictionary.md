@@ -24,8 +24,9 @@
 | full_name | String(255) | default "" | ชื่อ-นามสกุลจริง |
 | role | Enum | NOT NULL, default viewer | บทบาท 7 ระดับ: super_admin / admin / editor / approver / viewer / operator / device |
 | is_active | Boolean | default true | บัญชีเปิดใช้งานอยู่หรือไม่ |
-| is_locked | Boolean | default false | ถูกล็อกจาก login ผิดหลายครั้ง (§26) |
+| is_locked | Boolean | default false | ผู้ดูแลระบบสั่งล็อกด้วยมือ — ปลดได้ด้วยคนเท่านั้น (§26) |
 | failed_login_count | Integer | default 0 | จำนวนครั้งที่ login ผิดติดต่อกัน |
+| locked_until | DateTime(tz) | ? | ระบบล็อกชั่วคราวจาก login ผิดเกินกำหนด ถึงเวลานี้แล้วปลดเอง (§26) |
 | created_at | DateTime(tz) | NOT NULL | เวลาสร้างบัญชี |
 | updated_at | DateTime(tz) | auto-update | เวลาแก้ไขล่าสุด |
 | last_login_at | DateTime(tz) | ? | เวลา login ล่าสุด |

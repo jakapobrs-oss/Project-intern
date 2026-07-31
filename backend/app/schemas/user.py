@@ -28,6 +28,9 @@ class UserUpdate(BaseModel):
     full_name: str | None = Field(None, max_length=255)
     role: Role | None = None
     is_active: bool | None = None
+    # ต้องประกาศไว้ ไม่งั้น Pydantic ทิ้งฟิลด์นี้เงียบ ๆ แล้วปุ่มล็อก/ปลดล็อกในหน้า users
+    # จะตอบ 200 โดยไม่มีอะไรเปลี่ยน (บั๊กเดิม: ปลดล็อกได้ทางเดียวคือแก้ DB ตรง ๆ)
+    is_locked: bool | None = None
     password: str | None = Field(None, min_length=8, max_length=128)
 
 
@@ -37,6 +40,8 @@ class UserOut(UserBase):
 
     id: uuid.UUID
     is_locked: bool
+    # ว่าง = ไม่ได้ถูกล็อกชั่วคราว; มีค่า = ระบบล็อกจากการกรอกรหัสผิด จนถึงเวลานี้
+    locked_until: datetime | None = None
     created_at: datetime
     updated_at: datetime
     last_login_at: datetime | None = None

@@ -2,8 +2,9 @@
 Auth service — business logic ของ login / refresh / account lockout
 แยกออกจาก endpoint เพื่อ test ง่าย + reuse ได้
 """
+import math
 import uuid
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from sqlalchemy import or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -20,8 +21,10 @@ from app.core.security import (
 from app.models.user import User
 
 
-# §26: lockout หลัง fail 5 ครั้ง (ปลดเอง = admin reset หรือรอ unlock policy ใน Phase ถัดไป)
-MAX_FAILED_LOGIN = 5
+# §26: กรอกรหัสผิดครบ N ครั้ง → ล็อก "ชั่วคราว" แล้วปลดเองเมื่อครบเวลา (ปรับได้ที่ config)
+# ห้ามกลับไปล็อกถาวร: ล็อกถาวรทำให้ใครก็ตามที่รู้แค่ชื่อผู้ใช้ ปิดบัญชีคนอื่นได้ตลอดกาล
+# และ super_admin บัญชีเดียวที่ล็อกตัวเองจะไม่มีใครปลดให้ (ดู alembic 0006)
+MAX_FAILED_LOGIN = settings.max_failed_login  # เก็บชื่อเดิมไว้ให้โค้ด/เทสเก่าที่ import ยังใช้ได้
 
 
 class AuthError(Exception):
@@ -30,6 +33,33 @@ class AuthError(Exception):
         self.code = code
         self.message = message
         super().__init__(message)
+
+
+def _as_utc(dt: datetime | None) -> datetime | None:
+    """
+    ทำให้ datetime มีโซนเวลาเสมอก่อนนำไปเทียบ
+
+    SQLite (ที่ pytest ใช้) ไม่เก็บโซนเวลา — อ่านกลับมาได้ datetime แบบไม่มี tzinfo
+    ถ้าเอาไปเทียบกับเวลาที่มี tzinfo ตรง ๆ Python จะโยน TypeError
+    ค่าที่เราเขียนลงไปเป็น UTC เสมอ จึงเติม UTC ให้ตัวที่ไม่มีได้อย่างปลอดภัย
+    """
+    if dt is None:
+        return None
+    return dt if dt.tzinfo is not None else dt.replace(tzinfo=timezone.utc)
+
+
+def lockout_seconds_left(user: User, now: datetime | None = None) -> int:
+    """เหลือกี่วินาทีกว่าจะปลดล็อกชั่วคราว — 0 = ไม่ได้ถูกล็อก/หมดเวลาแล้ว"""
+    until = _as_utc(user.locked_until)
+    if until is None:
+        return 0
+    now = now or datetime.now(timezone.utc)
+    return max(0, math.ceil((until - now).total_seconds()))
+
+
+def _lockout_message(seconds_left: int) -> str:
+    minutes_left = max(1, math.ceil(seconds_left / 60))
+    return f"กรอกรหัสผ่านผิดเกินกำหนด บัญชีถูกล็อกชั่วคราว ลองใหม่ในอีก {minutes_left} นาที"
 
 
 async def _find_user(db: AsyncSession, username_or_email: str) -> User | None:
@@ -44,7 +74,7 @@ async def _find_user(db: AsyncSession, username_or_email: str) -> User | None:
 async def authenticate(db: AsyncSession, username: str, password: str) -> User:
     """
     ตรวจสอบ credential — ถ้าผ่านคืน User, ถ้าไม่ผ่าน raise AuthError
-    เพิ่ม failed_login_count + lock account เมื่อเกิน
+    นับครั้งที่ผิด และล็อกบัญชี "ชั่วคราว" เมื่อผิดครบกำหนด
     """
     user = await _find_user(db, username)
     if user is None:
@@ -54,18 +84,39 @@ async def authenticate(db: AsyncSession, username: str, password: str) -> User:
     if not user.is_active:
         raise AuthError("ACCOUNT_DISABLED", "บัญชีถูกปิดใช้งาน")
 
+    # ล็อกด้วยมือโดย admin — ต้องให้คนมาปลดเท่านั้น
     if user.is_locked:
-        raise AuthError("ACCOUNT_LOCKED", "บัญชีถูกล็อกจากการ login ผิดเกินกำหนด ติดต่อ admin")
+        raise AuthError("ACCOUNT_LOCKED", "บัญชีถูกล็อกโดยผู้ดูแลระบบ ติดต่อ admin")
+
+    # ล็อกชั่วคราวจากการเดารหัส — ยังไม่ถึงเวลาปลด
+    seconds_left = lockout_seconds_left(user)
+    if seconds_left > 0:
+        raise AuthError("ACCOUNT_LOCKED_TEMP", _lockout_message(seconds_left))
+
+    # ถึงเวลาปลดแล้ว → ล้างสถานะทิ้ง เริ่มนับใหม่ (ค่าจะถูก commit ไปกับผลลัพธ์ด้านล่าง)
+    if user.locked_until is not None:
+        user.locked_until = None
+        user.failed_login_count = 0
 
     if not verify_password(password, user.password_hash):
         user.failed_login_count += 1
-        if user.failed_login_count >= MAX_FAILED_LOGIN:
-            user.is_locked = True
+        if user.failed_login_count >= settings.max_failed_login:
+            # ล็อกชั่วคราว + รีเซ็ตตัวนับ เพื่อให้รอบถัดไปหลังปลดเริ่มนับจากศูนย์
+            user.locked_until = datetime.now(timezone.utc) + timedelta(
+                minutes=settings.lockout_minutes
+            )
+            user.failed_login_count = 0
+            await db.commit()
+            raise AuthError(
+                "ACCOUNT_LOCKED_TEMP",
+                _lockout_message(settings.lockout_minutes * 60),
+            )
         await db.commit()
         raise AuthError("INVALID_CREDENTIALS", "username หรือ password ไม่ถูกต้อง")
 
-    # success → reset counter + บันทึก last_login
+    # success → reset counter + ล้างล็อกชั่วคราว + บันทึก last_login
     user.failed_login_count = 0
+    user.locked_until = None
     user.last_login_at = datetime.now(timezone.utc)
     await db.commit()
     await db.refresh(user)
@@ -103,6 +154,9 @@ async def refresh_tokens(db: AsyncSession, refresh_token: str) -> tuple[User, st
     except (ValueError, TypeError) as e:
         raise AuthError("INVALID_TOKEN", "refresh token subject ไม่ถูกต้อง") from e
 
+    # เช็คแค่ is_locked (ล็อกโดย admin) — ไม่เช็ค locked_until โดยตั้งใจ
+    # ล็อกชั่วคราวเกิดจากคน "อื่น" เดารหัสเราผิดก็ได้ ถ้าให้มันตัด session ที่ใช้งานอยู่
+    # ใครก็เตะเราออกจากระบบกลางคันได้ด้วยการกรอกรหัสผิดใส่ชื่อเราไม่กี่ครั้ง
     user = await db.get(User, user_pk)
     if user is None or not user.is_active or user.is_locked:
         raise AuthError("INVALID_TOKEN", "user ไม่พร้อมใช้งาน")

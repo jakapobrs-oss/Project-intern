@@ -60,6 +60,14 @@ class Settings(BaseSettings):
     sentry_traces_sample_rate: float = 0.0   # 0.0 = ไม่ส่ง performance trace
     sentry_environment: str = ""              # ใช้ app_env ถ้าไม่ระบุ
 
+    # ===== Account lockout (§26) — ชั้นที่ 2 ถัดจาก rate limit =====
+    # กรอกรหัสผิดครบ max_failed_login ครั้ง → ล็อกชั่วคราว lockout_minutes นาที แล้วปลดเอง
+    # ตั้งใจให้ "ชั่วคราว" ไม่ใช่ถาวร เพราะล็อกถาวรเปิดช่องให้ใครก็ได้ที่รู้ชื่อผู้ใช้
+    # จงใจกรอกผิดเพื่อปิดบัญชีคนอื่น (account-lockout DoS) และทำให้ super_admin
+    # บัญชีเดียวล็อกตัวเองแล้วไม่มีใครปลดได้
+    max_failed_login: int = 5
+    lockout_minutes: int = 15
+
     # ===== Rate limit (Phase 7) — protect /auth/login จาก brute force =====
     rate_limit_max_requests: int = 10        # ต่อ window
     rate_limit_window_sec: int = 60          # 10 requests / 60s default
