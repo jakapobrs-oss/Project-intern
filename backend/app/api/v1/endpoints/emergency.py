@@ -85,6 +85,7 @@ async def create_broadcast(
 async def update_broadcast(
     bid: UUID,
     body: EmergencyUpdate,
+    request: Request,
     user: User = Depends(require_role(*MUTATE_ROLES)),
     db: AsyncSession = Depends(get_db),
 ):
@@ -102,6 +103,12 @@ async def update_broadcast(
 
     await db.commit()
     await db.refresh(row)
+    await audit_service.log_action(
+        db, request, user, "emergency.update",
+        target_type="emergency", target_id=row.id,
+        message=f"แก้ไขประกาศฉุกเฉิน {row.title} ฟิลด์ {', '.join(sorted(data))}",
+        extra={"fields": sorted(data)},
+    )
     return row
 
 

@@ -6,21 +6,74 @@ Audit service — เขียน AuditLog entries แบบ best-effort (ไม
 - เรียกจาก endpoint หรือ service layer ทั้งสำหรับ success + denied + fail
 - ใส่ context (ip, user-agent) ส่งมาจาก endpoint (Request object)
 
-ตัวอย่าง action verb (กำหนดให้สม่ำเสมอ):
-- auth.login / auth.refresh / auth.logout / auth.login_failed
-- user.create / user.update / user.delete
-- content.upload / content.approve / content.reject
-- schedule.activate / schedule.pause
-- device.pair / device.unpair / device.command_sent
-- emergency.activate / emergency.cancel
-- rbac.denied
+action verb ทั้งหมดอยู่ที่ AUDIT_ACTIONS ด้านล่าง — **แหล่งความจริงเดียว**
+หน้าจอ audit ดึงรายการนี้ผ่าน GET /api/v1/audit/actions แทนการพิมพ์ลิสต์ซ้ำเอง
+(เดิมฝั่งหน้าจอ hardcode ไว้แล้วหลุดจากของจริง จนมีตัวเลือกที่ไม่มีวันมีข้อมูล)
 """
 from __future__ import annotations
 from typing import Any
+from fastapi import Request
 from loguru import logger
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.audit import AuditLog, AuditOutcome
+from app.models.user import User
+
+
+# ทุก action ที่ระบบเขียนจริง — เพิ่ม action ใหม่ที่ไหน ต้องมาเติมที่นี่ด้วย
+# ไม่งั้นตัวกรองในหน้าจอจะไม่มีให้เลือก (แต่ข้อมูลยังถูกบันทึกปกติ)
+AUDIT_ACTIONS: list[str] = [
+    # การเข้าใช้งานระบบ
+    "auth.login",
+    "auth.logout",
+    "auth.refresh",
+    # ผู้ใช้งาน
+    "user.create",
+    "user.update",
+    "user.delete",
+    # สื่อ
+    "content.upload",
+    "content.create_url",
+    "content.update",
+    "content.delete",
+    "content.submit",
+    "content.approve",
+    "content.reject",
+    # เครื่องเล่น
+    "device.create",
+    "device.update",
+    "device.delete",
+    "device.pair",
+    "device.regenerate_pairing",
+    # กลุ่มจอ
+    "group.create",
+    "group.update",
+    "group.delete",
+    # ชุดนำเสนอ / ผังเวลา / ตารางออกอากาศ
+    "presentation.create",
+    "presentation.update",
+    "presentation.delete",
+    "plan.create",
+    "plan.update",
+    "plan.delete",
+    "schedule.create",
+    "schedule.update",
+    "schedule.delete",
+    # หมายเหตุ: การกดอนุมัติ (POST /schedules/{id}/approve) บันทึกเป็น schedule.activate
+    # เพราะผลลัพธ์คือทำให้ตารางออกอากาศจริง — ไม่มี action ชื่อ schedule.approve
+    "schedule.activate",
+    "schedule.pause",
+    # ประกาศฉุกเฉิน
+    "emergency.create",
+    "emergency.update",
+    "emergency.activate",
+    "emergency.cancel",
+    # ควบคุมจอ
+    "tv.command_sent",
+    "led.message",
+    # ความปลอดภัย
+    "rbac.denied",
+]
 
 
 async def log_event(
@@ -76,6 +129,39 @@ async def log_event(
             except Exception:  # noqa: BLE001
                 pass
         return None
+
+
+async def log_action(
+    db: AsyncSession,
+    request: Request | None,
+    actor: User | None,
+    action: str,
+    *,
+    target_type: str | None = None,
+    target_id: Any = None,
+    message: str | None = None,
+    outcome: AuditOutcome = AuditOutcome.SUCCESS,
+    extra: dict[str, Any] | None = None,
+) -> AuditLog | None:
+    """
+    ทางลัดของ log_event สำหรับกรณีที่พบบ่อยที่สุด — "ผู้ใช้ที่ล็อกอินอยู่ทำอะไรกับอะไร"
+
+    ดึง ip/user-agent จาก request และชื่อผู้ทำจาก actor ให้เอง เพื่อให้จุดเรียกสั้นลง
+    (เดิมทุกจุดต้องเขียน actor_id/actor_label/extract_request_context เองครบทุกครั้ง
+    ซึ่งยาวจนไม่มีใครอยากใส่ — เป็นสาเหตุหนึ่งที่ CRUD ส่วนใหญ่ไม่เคยถูกบันทึก)
+    """
+    return await log_event(
+        db,
+        action=action,
+        actor_id=str(actor.id) if actor is not None else None,
+        actor_label=actor.username if actor is not None else None,
+        target_type=target_type,
+        target_id=str(target_id) if target_id is not None else None,
+        outcome=outcome,
+        message=message,
+        extra=extra,
+        **extract_request_context(request),
+    )
 
 
 def extract_request_context(request) -> dict[str, str | None]:

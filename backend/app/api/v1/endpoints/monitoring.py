@@ -14,6 +14,7 @@ from app.core.metrics import build_metrics
 from app.db import get_db
 from app.models.audit import AuditLog, AuditOutcome
 from app.models.user import Role
+from app.services import audit_service
 
 
 router = APIRouter()
@@ -41,6 +42,19 @@ class AuditLogOut(BaseModel):
     message: str | None
     extra: dict | None
     created_at: datetime
+
+
+@router.get("/audit/actions", response_model=list[str])
+async def list_audit_actions(
+    _=Depends(require_role(Role.SUPER_ADMIN, Role.ADMIN)),
+):
+    """
+    รายชื่อ action ทั้งหมดที่ระบบบันทึก — ให้หน้าจอเอาไปทำตัวเลือกในตัวกรอง
+
+    มีไว้เพื่อไม่ให้ฝั่งหน้าจอ hardcode รายการเอง ซึ่งเคยหลุดจากของจริงจนมีตัวเลือก
+    ที่ไม่มีวันมีข้อมูล (auth.login_failed / content.upload / rbac.denied)
+    """
+    return audit_service.AUDIT_ACTIONS
 
 
 @router.get("/audit/logs", response_model=list[AuditLogOut])

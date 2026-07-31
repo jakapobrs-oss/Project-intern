@@ -3,7 +3,7 @@ Device + PlayerGroup endpoints
 ดู §13 ใน PLAN.md
 """
 import uuid
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Request, status
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -15,7 +15,7 @@ from app.schemas.device import (
     DeviceCreate, DeviceUpdate, DeviceOut,
     PlayerGroupCreate, PlayerGroupUpdate, PlayerGroupOut,
 )
-from app.services import device_service
+from app.services import audit_service, device_service
 
 
 router = APIRouter()
@@ -39,8 +39,9 @@ async def list_devices(
 @router.post("", response_model=DeviceOut, status_code=201)
 async def create_device(
     payload: DeviceCreate,
+    request: Request,
     db: AsyncSession = Depends(get_db),
-    _: User = Depends(_can_manage),
+    actor: User = Depends(_can_manage),
 ):
     """สร้าง device + ออก pairing code อัตโนมัติ"""
     device = Device(**payload.model_dump())
@@ -49,6 +50,11 @@ async def create_device(
     db.add(device)
     await db.commit()
     await db.refresh(device)
+    await audit_service.log_action(
+        db, request, actor, "device.create",
+        target_type="device", target_id=device.id,
+        message=f"สร้างจอ {device.name}",
+    )
     return device
 
 
@@ -68,37 +74,53 @@ async def get_device(
 async def update_device(
     device_id: uuid.UUID,
     payload: DeviceUpdate,
+    request: Request,
     db: AsyncSession = Depends(get_db),
-    _: User = Depends(_can_manage),
+    actor: User = Depends(_can_manage),
 ):
     device = await db.get(Device, device_id)
     if device is None:
         raise HTTPException(404, "ไม่พบ device")
-    for k, v in payload.model_dump(exclude_unset=True).items():
+    data = payload.model_dump(exclude_unset=True)
+    for k, v in data.items():
         setattr(device, k, v)
     await db.commit()
     await db.refresh(device)
+    await audit_service.log_action(
+        db, request, actor, "device.update",
+        target_type="device", target_id=device.id,
+        message=f"แก้ไขจอ {device.name} ฟิลด์ {', '.join(sorted(data))}",
+        extra={"fields": sorted(data)},
+    )
     return device
 
 
 @router.delete("/{device_id}", status_code=204)
 async def delete_device(
     device_id: uuid.UUID,
+    request: Request,
     db: AsyncSession = Depends(get_db),
-    _: User = Depends(_can_manage),
+    actor: User = Depends(_can_manage),
 ):
     device = await db.get(Device, device_id)
     if device is None:
         raise HTTPException(404, "ไม่พบ device")
+    deleted_name = device.name
     await db.delete(device)
     await db.commit()
+    await audit_service.log_action(
+        db, request, actor, "device.delete",
+        target_type="device", target_id=device_id,
+        message=f"ลบจอ {deleted_name}",
+    )
 
 
 @router.post("/{device_id}/regenerate-pairing", response_model=DeviceOut)
 async def regenerate_pairing(
     device_id: uuid.UUID,
+    request: Request,
     db: AsyncSession = Depends(get_db),
-    _: User = Depends(_can_manage),
+    actor: User = Depends(_can_manage),
 ):
     """รีเซ็ต pairing code (ถ้ายังไม่ได้ pair หรือต้องการ re-pair)"""
     device = await db.get(Device, device_id)
@@ -110,6 +132,12 @@ async def regenerate_pairing(
     device.status = DeviceStatus.UNPAIRED
     await db.commit()
     await db.refresh(device)
+    # ออกรหัสจับคู่ใหม่ = ตัดสิทธิ์เครื่องเดิมออกจากระบบ ต้องมีร่องรอยว่าใครสั่ง
+    await audit_service.log_action(
+        db, request, actor, "device.regenerate_pairing",
+        target_type="device", target_id=device.id,
+        message=f"ออกรหัสจับคู่ใหม่ให้จอ {device.name}",
+    )
     return device
 
 
@@ -140,14 +168,20 @@ async def list_groups(db: AsyncSession = Depends(get_db), _: User = Depends(_can
 @group_router.post("", response_model=PlayerGroupOut, status_code=201)
 async def create_group(
     payload: PlayerGroupCreate,
+    request: Request,
     db: AsyncSession = Depends(get_db),
-    _: User = Depends(_can_manage),
+    actor: User = Depends(_can_manage),
 ):
     group = PlayerGroup(name=payload.name, description=payload.description)
     group.devices = await _load_devices(db, payload.device_ids)
     db.add(group)
     await db.commit()
     await db.refresh(group)
+    await audit_service.log_action(
+        db, request, actor, "group.create",
+        target_type="group", target_id=group.id,
+        message=f"สร้างกลุ่มจอ {group.name} ({len(group.devices)} จอ)",
+    )
     return _group_to_out(group)
 
 
@@ -155,33 +189,48 @@ async def create_group(
 async def update_group(
     group_id: uuid.UUID,
     payload: PlayerGroupUpdate,
+    request: Request,
     db: AsyncSession = Depends(get_db),
-    _: User = Depends(_can_manage),
+    actor: User = Depends(_can_manage),
 ):
     group = await db.get(PlayerGroup, group_id)
     if group is None:
         raise HTTPException(404, "ไม่พบ group")
     data = payload.model_dump(exclude_unset=True)
+    changed_fields = sorted(data)
     if "device_ids" in data:
         group.devices = await _load_devices(db, data.pop("device_ids"))
     for k, v in data.items():
         setattr(group, k, v)
     await db.commit()
     await db.refresh(group)
+    await audit_service.log_action(
+        db, request, actor, "group.update",
+        target_type="group", target_id=group.id,
+        message=f"แก้ไขกลุ่มจอ {group.name} ฟิลด์ {', '.join(changed_fields)}",
+        extra={"fields": changed_fields},
+    )
     return _group_to_out(group)
 
 
 @group_router.delete("/{group_id}", status_code=204)
 async def delete_group(
     group_id: uuid.UUID,
+    request: Request,
     db: AsyncSession = Depends(get_db),
-    _: User = Depends(_can_manage),
+    actor: User = Depends(_can_manage),
 ):
     group = await db.get(PlayerGroup, group_id)
     if group is None:
         raise HTTPException(404, "ไม่พบ group")
+    deleted_name = group.name
     await db.delete(group)
     await db.commit()
+    await audit_service.log_action(
+        db, request, actor, "group.delete",
+        target_type="group", target_id=group_id,
+        message=f"ลบกลุ่มจอ {deleted_name}",
+    )
 
 
 def _group_to_out(group: PlayerGroup) -> PlayerGroupOut:

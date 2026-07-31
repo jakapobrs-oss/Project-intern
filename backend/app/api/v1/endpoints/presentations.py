@@ -2,7 +2,7 @@
 Presentation endpoints (§35.1 — layer ใหม่ระหว่าง content กับ plan)
 """
 import uuid
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Request
 from sqlalchemy import select
 from sqlalchemy.orm import selectinload
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -14,6 +14,7 @@ from app.models.user import User, Role
 from app.schemas.presentation import (
     PresentationCreate, PresentationUpdate, PresentationOut,
 )
+from app.services import audit_service
 
 
 router = APIRouter()
@@ -41,6 +42,7 @@ async def list_presentations(db: AsyncSession = Depends(get_db), _: User = Depen
 @router.post("", response_model=PresentationOut, status_code=201)
 async def create_presentation(
     payload: PresentationCreate,
+    request: Request,
     db: AsyncSession = Depends(get_db),
     user: User = Depends(_can_edit),
 ):
@@ -62,6 +64,11 @@ async def create_presentation(
     ]
     db.add(p)
     await db.commit()
+    await audit_service.log_action(
+        db, request, user, "presentation.create",
+        target_type="presentation", target_id=p.id,
+        message=f"สร้างชุดนำเสนอ {p.name} ({len(payload.zones)} โซน)",
+    )
     return await _load_with_zones(db, p.id)
 
 
@@ -81,14 +88,17 @@ async def get_presentation(
 async def update_presentation(
     presentation_id: uuid.UUID,
     payload: PresentationUpdate,
+    request: Request,
     db: AsyncSession = Depends(get_db),
-    _: User = Depends(_can_edit),
+    user: User = Depends(_can_edit),
 ):
     p = await _load_with_zones(db, presentation_id)
     if p is None:
         raise HTTPException(404, "ไม่พบ presentation")
 
     data = payload.model_dump(exclude_unset=True)
+    changed_fields = sorted(data)
+    presentation_name = p.name
     if "zones" in data:
         # ลบ zones เก่าทั้งหมด → สร้างใหม่ (relationship มี cascade delete-orphan)
         p.zones = [
@@ -97,17 +107,30 @@ async def update_presentation(
     for k, v in data.items():
         setattr(p, k, v)
     await db.commit()
+    await audit_service.log_action(
+        db, request, user, "presentation.update",
+        target_type="presentation", target_id=presentation_id,
+        message=f"แก้ไขชุดนำเสนอ {presentation_name} ฟิลด์ {', '.join(changed_fields)}",
+        extra={"fields": changed_fields},
+    )
     return await _load_with_zones(db, p.id)
 
 
 @router.delete("/{presentation_id}", status_code=204)
 async def delete_presentation(
     presentation_id: uuid.UUID,
+    request: Request,
     db: AsyncSession = Depends(get_db),
-    _: User = Depends(_can_edit),
+    user: User = Depends(_can_edit),
 ):
     p = await db.get(Presentation, presentation_id)
     if p is None:
         raise HTTPException(404, "ไม่พบ presentation")
+    deleted_name = p.name
     await db.delete(p)
     await db.commit()
+    await audit_service.log_action(
+        db, request, user, "presentation.delete",
+        target_type="presentation", target_id=presentation_id,
+        message=f"ลบชุดนำเสนอ {deleted_name}",
+    )

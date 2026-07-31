@@ -2,7 +2,7 @@
 User CRUD endpoints — เฉพาะ SUPER_ADMIN (ดู §21)
 """
 import uuid
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Request, status
 from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -12,6 +12,7 @@ from app.core.security import hash_password
 from app.db import get_db
 from app.models.user import User, Role
 from app.schemas.user import UserCreate, UserUpdate, UserOut
+from app.services import audit_service
 
 
 router = APIRouter()
@@ -34,8 +35,9 @@ async def list_users(
 @router.post("", response_model=UserOut, status_code=status.HTTP_201_CREATED)
 async def create_user(
     payload: UserCreate,
+    request: Request,
     db: AsyncSession = Depends(get_db),
-    _: User = Depends(_admin_only),
+    actor: User = Depends(_admin_only),
 ):
     """สร้าง user ใหม่ — username + email ต้อง unique"""
     user = User(
@@ -53,6 +55,11 @@ async def create_user(
         await db.rollback()
         raise HTTPException(status_code=409, detail="username หรือ email ซ้ำ")
     await db.refresh(user)
+    await audit_service.log_action(
+        db, request, actor, "user.create",
+        target_type="user", target_id=user.id,
+        message=f"สร้างผู้ใช้ {user.username} สิทธิ์ {user.role.value}",
+    )
     return user
 
 
@@ -72,14 +79,17 @@ async def get_user(
 async def update_user(
     user_id: uuid.UUID,
     payload: UserUpdate,
+    request: Request,
     db: AsyncSession = Depends(get_db),
-    _: User = Depends(_admin_only),
+    actor: User = Depends(_admin_only),
 ):
     user = await db.get(User, user_id)
     if user is None:
         raise HTTPException(status_code=404, detail="ไม่พบ user")
 
     data = payload.model_dump(exclude_unset=True)
+    # เก็บรายชื่อฟิลด์ไว้ลง audit — ห้ามเก็บค่ารหัสผ่านลง log เด็ดขาด เอาแค่ชื่อฟิลด์
+    changed_fields = sorted(data.keys())
     if "password" in data and data["password"]:
         user.password_hash = hash_password(data.pop("password"))
         # password เปลี่ยน → ปลดล็อกทุกชนิด + reset counter
@@ -99,12 +109,19 @@ async def update_user(
         await db.rollback()
         raise HTTPException(status_code=409, detail="email ซ้ำกับ user อื่น")
     await db.refresh(user)
+    await audit_service.log_action(
+        db, request, actor, "user.update",
+        target_type="user", target_id=user.id,
+        message=f"แก้ไขผู้ใช้ {user.username} ฟิลด์ {', '.join(changed_fields)}",
+        extra={"fields": changed_fields},
+    )
     return user
 
 
 @router.delete("/{user_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_user(
     user_id: uuid.UUID,
+    request: Request,
     db: AsyncSession = Depends(get_db),
     current: User = Depends(_admin_only),
 ):
@@ -114,6 +131,13 @@ async def delete_user(
     user = await db.get(User, user_id)
     if user is None:
         raise HTTPException(status_code=404, detail="ไม่พบ user")
+    # อ่านค่าไว้ก่อนลบ — หลัง delete แล้ว object จะอ่านไม่ได้
+    deleted_label = f"{user.username} สิทธิ์ {user.role.value}"
     await db.delete(user)
     await db.commit()
+    await audit_service.log_action(
+        db, request, current, "user.delete",
+        target_type="user", target_id=user_id,
+        message=f"ลบผู้ใช้ {deleted_label}",
+    )
     return None

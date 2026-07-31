@@ -43,6 +43,7 @@ async def _detect_conflicts(db: AsyncSession, candidate: Schedule) -> list[Sched
 @router.post("", response_model=ScheduleOut, status_code=201)
 async def create_schedule(
     payload: ScheduleCreate,
+    request: Request,
     db: AsyncSession = Depends(get_db),
     user: User = Depends(_can_edit),
     force: bool = False,
@@ -78,6 +79,12 @@ async def create_schedule(
     db.add(sch)
     await db.commit()
     await db.refresh(sch)
+    await audit_service.log_action(
+        db, request, user, "schedule.create",
+        target_type="schedule", target_id=sch.id,
+        message=f"สร้างตารางออกอากาศ {sch.name} สถานะ {sch.status.value}",
+        extra={"forced_over_conflict": force},
+    )
     return sch
 
 
@@ -93,30 +100,45 @@ async def get_schedule(schedule_id: uuid.UUID, db: AsyncSession = Depends(get_db
 async def update_schedule(
     schedule_id: uuid.UUID,
     payload: ScheduleUpdate,
+    request: Request,
     db: AsyncSession = Depends(get_db),
-    _: User = Depends(_can_edit),
+    user: User = Depends(_can_edit),
 ):
     sch = await db.get(Schedule, schedule_id)
     if sch is None:
         raise HTTPException(404, "ไม่พบ schedule")
-    for k, v in payload.model_dump(exclude_unset=True).items():
+    data = payload.model_dump(exclude_unset=True)
+    for k, v in data.items():
         setattr(sch, k, v)
     await db.commit()
     await db.refresh(sch)
+    await audit_service.log_action(
+        db, request, user, "schedule.update",
+        target_type="schedule", target_id=sch.id,
+        message=f"แก้ไขตารางออกอากาศ {sch.name} ฟิลด์ {', '.join(sorted(data))}",
+        extra={"fields": sorted(data)},
+    )
     return sch
 
 
 @router.delete("/{schedule_id}", status_code=204)
 async def delete_schedule(
     schedule_id: uuid.UUID,
+    request: Request,
     db: AsyncSession = Depends(get_db),
-    _: User = Depends(_can_edit),
+    user: User = Depends(_can_edit),
 ):
     sch = await db.get(Schedule, schedule_id)
     if sch is None:
         raise HTTPException(404, "ไม่พบ schedule")
+    deleted_name = sch.name
     await db.delete(sch)
     await db.commit()
+    await audit_service.log_action(
+        db, request, user, "schedule.delete",
+        target_type="schedule", target_id=schedule_id,
+        message=f"ลบตารางออกอากาศ {deleted_name}",
+    )
 
 
 @router.post("/{schedule_id}/approve", response_model=ScheduleOut)

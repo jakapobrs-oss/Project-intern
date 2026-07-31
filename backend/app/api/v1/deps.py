@@ -93,11 +93,28 @@ def require_role(*allowed: Role):
     """
     Factory → dependency ที่จะอนุญาตเฉพาะ role ที่ระบุ
     ใช้: Depends(require_role(Role.ADMIN, Role.SUPER_ADMIN))
+
+    การถูกปฏิเสธสิทธิ์บันทึกลง audit ที่นี่จุดเดียว (action `rbac.denied`) — ครอบคลุม
+    ทุก endpoint ที่ใช้ dependency นี้ ไม่ต้องไปเขียนดักทีละที่ให้ตกหล่น
     """
     allowed_set = set(allowed)
 
-    async def _checker(user: User = Depends(get_current_user)) -> User:
+    async def _checker(
+        request: Request,
+        user: User = Depends(get_current_user),
+        db: AsyncSession = Depends(get_db),
+    ) -> User:
         if user.role not in allowed_set:
+            # import ตรงนี้กัน circular import (audit_service → models → deps)
+            from app.models.audit import AuditOutcome
+            from app.services import audit_service
+
+            await audit_service.log_action(
+                db, request, user, "rbac.denied",
+                outcome=AuditOutcome.DENIED,
+                message=f"สิทธิ์ {user.role.value} เข้าถึง {request.method} {request.url.path} ไม่ได้",
+                extra={"required_roles": sorted(r.value for r in allowed_set)},
+            )
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
                 detail=f"role '{user.role.value}' ไม่มีสิทธิ์ (ต้องเป็น {[r.value for r in allowed_set]})",

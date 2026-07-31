@@ -22,25 +22,6 @@ import {
   Spinner,
 } from "@/components/ui";
 
-// action verbs ที่ backend ใช้ — sync กับ services/audit_service.py
-const ACTION_OPTIONS = [
-  "",
-  "auth.login",
-  "auth.login_failed",
-  "auth.refresh",
-  "content.upload",
-  "content.approve",
-  "content.reject",
-  "schedule.activate",
-  "schedule.pause",
-  "device.pair",
-  "tv.command_sent",
-  "emergency.create",
-  "emergency.activate",
-  "emergency.cancel",
-  "rbac.denied",
-];
-
 export default function AuditPage() {
   const [logs, setLogs] = useState<AuditLog[] | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -48,6 +29,9 @@ export default function AuditPage() {
   const [outcome, setOutcome] = useState<AuditOutcome | "">("");
   const [actorId, setActorId] = useState("");
   const [targetId, setTargetId] = useState("");
+  // ดึงรายชื่อ action จาก backend แทนการเขียนลิสต์ไว้เอง — เดิม hardcode แล้วหลุดจาก
+  // ของจริง จนมีตัวเลือกที่ไม่มีวันมีข้อมูล (auth.login_failed, content.upload ฯลฯ)
+  const [actionOptions, setActionOptions] = useState<string[]>([]);
 
   const load = async () => {
     setError(null);
@@ -67,13 +51,19 @@ export default function AuditPage() {
 
   useEffect(() => {
     load();
+    api
+      .get<string[]>("/audit/actions")
+      .then(setActionOptions)
+      // โหลดตัวเลือกไม่ได้ ไม่ควรทำให้หน้าพัง — ยังดู log ทั้งหมดได้อยู่
+      .catch(() => setActionOptions([]));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
     <div className="space-y-4">
       <p className="text-sm text-slate-600">
-        Audit log — บันทึก action ทุกอย่างใน system (append-only) §26 §31
+        Audit log — บันทึกทุกการเปลี่ยนแปลงข้อมูล (สร้าง/แก้ไข/ลบ) การเข้า-ออกระบบ
+        และการถูกปฏิเสธสิทธิ์ · เขียนอย่างเดียว ลบไม่ได้ (append-only) §26 §31
       </p>
 
       {/* Filter bar */}
@@ -83,9 +73,10 @@ export default function AuditPage() {
             <div className="min-w-[200px] flex-1">
               <label className="mb-1 block text-xs font-medium">Action</label>
               <Select value={action} onChange={(e) => setAction(e.target.value)}>
-                {ACTION_OPTIONS.map((a) => (
+                <option value="">ทุก action</option>
+                {actionOptions.map((a) => (
                   <option key={a} value={a}>
-                    {a || "ทุก action"}
+                    {a}
                   </option>
                 ))}
               </Select>

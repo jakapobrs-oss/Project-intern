@@ -147,6 +147,7 @@ async def login(
 
 @router.post("/refresh", response_model=TokenPair)
 async def refresh(
+    request: Request,
     response: Response,
     body: RefreshRequest | None = None,
     cookie_refresh: str | None = Cookie(default=None, alias=REFRESH_COOKIE_NAME),
@@ -174,9 +175,16 @@ async def refresh(
         )
 
     try:
-        _, access, new_refresh = await auth_service.refresh_tokens(db, refresh_token)
+        user, access, new_refresh = await auth_service.refresh_tokens(db, refresh_token)
     except AuthError as e:
+        # token ที่ใช้ไม่ได้ = อาจเป็นของหมดอายุ หรือมีคนพยายามใช้ token ปลอม ต้องมีร่องรอย
+        await audit_service.log_action(
+            db, request, None, "auth.refresh",
+            outcome=AuditOutcome.FAIL, message=e.code,
+        )
         raise _auth_error_to_http(e)
+
+    await audit_service.log_action(db, request, user, "auth.refresh")
 
     # rotate cookies ด้วย (cookie mode)
     _set_auth_cookies(response, access, new_refresh)
@@ -196,8 +204,10 @@ async def me(user: User = Depends(get_current_user)):
 
 @router.post("/logout", status_code=status.HTTP_204_NO_CONTENT)
 async def logout(
+    request: Request,
     response: Response,
-    _: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+    user: User = Depends(get_current_user),
 ):
     """
     Logout — clear httpOnly cookies
@@ -206,6 +216,7 @@ async def logout(
     Phase ถัดไปจะเพิ่ม jti blacklist ใน Redis
     """
     _clear_auth_cookies(response)
+    await audit_service.log_action(db, request, user, "auth.logout")
     return None
 
 

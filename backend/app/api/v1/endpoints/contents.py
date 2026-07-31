@@ -36,6 +36,7 @@ async def list_contents(
 
 @router.post("/upload", response_model=ContentOut, status_code=201)
 async def upload_content(
+    request: Request,
     name: str = Form(...),
     description: str = Form(""),
     file: UploadFile = File(...),
@@ -61,12 +62,18 @@ async def upload_content(
         await queue.enqueue("generate_thumbnail", str(content.id))
         if content.type == ContentType.VIDEO:
             await queue.enqueue("transcode_video", str(content.id))
+    await audit_service.log_action(
+        db, request, user, "content.upload",
+        target_type="content", target_id=content.id,
+        message=f"อัปโหลดสื่อ {content.name} ชนิด {content.type.value}",
+    )
     return content
 
 
 @router.post("/url", response_model=ContentOut, status_code=201)
 async def create_url_content(
     payload: ContentCreateUrl,
+    request: Request,
     db: AsyncSession = Depends(get_db),
     user: User = Depends(_can_upload),
 ):
@@ -88,6 +95,11 @@ async def create_url_content(
     db.add(content)
     await db.commit()
     await db.refresh(content)
+    await audit_service.log_action(
+        db, request, user, "content.create_url",
+        target_type="content", target_id=content.id,
+        message=f"เพิ่มสื่อแบบลิงก์ {content.name} ชนิด {content.type.value}",
+    )
     return content
 
 
@@ -107,37 +119,53 @@ async def get_content(
 async def update_content(
     content_id: uuid.UUID,
     payload: ContentUpdate,
+    request: Request,
     db: AsyncSession = Depends(get_db),
-    _: User = Depends(_can_upload),
+    user: User = Depends(_can_upload),
 ):
     content = await db.get(Content, content_id)
     if content is None:
         raise HTTPException(404, "ไม่พบ content")
-    for k, v in payload.model_dump(exclude_unset=True).items():
+    data = payload.model_dump(exclude_unset=True)
+    for k, v in data.items():
         setattr(content, k, v)
     await db.commit()
     await db.refresh(content)
+    await audit_service.log_action(
+        db, request, user, "content.update",
+        target_type="content", target_id=content.id,
+        message=f"แก้ไขสื่อ {content.name} ฟิลด์ {', '.join(sorted(data))}",
+        extra={"fields": sorted(data)},
+    )
     return content
 
 
 @router.delete("/{content_id}", status_code=204)
 async def delete_content(
     content_id: uuid.UUID,
+    request: Request,
     db: AsyncSession = Depends(get_db),
-    _: User = Depends(_can_upload),
+    user: User = Depends(_can_upload),
 ):
     content = await db.get(Content, content_id)
     if content is None:
         raise HTTPException(404, "ไม่พบ content")
+    deleted_name = content.name
     await db.delete(content)
     await db.commit()
+    await audit_service.log_action(
+        db, request, user, "content.delete",
+        target_type="content", target_id=content_id,
+        message=f"ลบสื่อ {deleted_name}",
+    )
 
 
 @router.post("/{content_id}/submit", response_model=ContentOut)
 async def submit_for_approval(
     content_id: uuid.UUID,
+    request: Request,
     db: AsyncSession = Depends(get_db),
-    _: User = Depends(_can_upload),
+    user: User = Depends(_can_upload),
 ):
     """ส่ง content ที่ status=draft → pending"""
     content = await db.get(Content, content_id)
@@ -148,6 +176,11 @@ async def submit_for_approval(
     content.approval_status = ApprovalStatus.PENDING
     await db.commit()
     await db.refresh(content)
+    await audit_service.log_action(
+        db, request, user, "content.submit",
+        target_type="content", target_id=content.id,
+        message=f"ส่งสื่อ {content.name} เข้าคิวรออนุมัติ",
+    )
     return content
 
 
