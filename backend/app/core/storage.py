@@ -11,11 +11,16 @@ from botocore.exceptions import ClientError
 from app.config import settings
 
 
-def get_s3_client():
-    """boto3 client ที่ชี้ไป MinIO/S3"""
+def get_s3_client(endpoint_url: str | None = None):
+    """
+    boto3 client ที่ชี้ไป MinIO/S3
+
+    endpoint_url: ปกติใช้ที่อยู่ฝั่งใน (settings.s3_endpoint) — ส่งค่าเข้ามาเฉพาะตอนต้องการ
+    sign URL ด้วย host สาธารณะให้เครื่องเล่นข้างนอกโหลดตรง (ดู presigned_get_url(public=True))
+    """
     return boto3.client(
         "s3",
-        endpoint_url=settings.s3_endpoint,
+        endpoint_url=endpoint_url or settings.s3_endpoint,
         aws_access_key_id=settings.s3_access_key,
         aws_secret_access_key=settings.s3_secret_key,
         region_name=settings.s3_region,
@@ -67,14 +72,40 @@ def upload_path(local_path: str, key: str, content_type: str | None = None, buck
     get_s3_client().upload_file(local_path, bucket, key, ExtraArgs=extra)
 
 
-def presigned_get_url(key: str, expires_in: int = 3600, bucket: str | None = None) -> str:
-    """สร้าง pre-signed URL ให้ player ใช้ download (§22 signed URL)"""
+def presigned_get_url(
+    key: str,
+    expires_in: int = 3600,
+    bucket: str | None = None,
+    public: bool = False,
+) -> str:
+    """
+    สร้าง pre-signed URL ให้ download (§22 signed URL)
+
+    public=True → sign ด้วย settings.s3_public_endpoint (ที่อยู่ที่เครื่องเล่นข้างนอกเข้าถึงได้)
+    ⚠️ ห้ามส่ง URL ที่ sign ด้วย s3_endpoint (ชื่อ service ใน docker) ออกไปให้เครื่องเล่น —
+    เครื่องข้างนอกแปลชื่อไม่ออกแล้วจะได้จอดำ ดู core/media_link.py
+    """
     bucket = bucket or settings.s3_bucket
-    return get_s3_client().generate_presigned_url(
+    endpoint = settings.s3_public_endpoint if public else None
+    return get_s3_client(endpoint).generate_presigned_url(
         "get_object",
         Params={"Bucket": bucket, "Key": key},
         ExpiresIn=expires_in,
     )
+
+
+def get_object(key: str, byte_range: str | None = None, bucket: str | None = None):
+    """
+    ดึง object จาก S3 แบบ stream (คืน response dict ของ boto3 — Body เป็น stream)
+
+    byte_range: ค่า Range header ดิบจาก client (เช่น "bytes=0-1023") ส่งต่อให้ S3 ตรงๆ
+    เพื่อให้เล่นวิดีโอแบบเลื่อนเวลาได้ — เป็น blocking call ผู้เรียกควรใช้ผ่าน threadpool
+    """
+    bucket = bucket or settings.s3_bucket
+    kwargs = {"Bucket": bucket, "Key": key}
+    if byte_range:
+        kwargs["Range"] = byte_range
+    return get_s3_client().get_object(**kwargs)
 
 
 # ===== utility: hash file streaming =====

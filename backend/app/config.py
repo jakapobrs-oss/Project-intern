@@ -27,11 +27,20 @@ class Settings(BaseSettings):
     redis_url: str = "redis://redis:6379/0"
 
     # ===== S3 / MinIO =====
+    # s3_endpoint = ที่อยู่ "ฝั่งใน" ที่ backend/worker ใช้คุยกับ MinIO (ชื่อ service ใน docker network)
     s3_endpoint: str = "http://minio:9000"
     s3_access_key: str = "minioadmin"
     s3_secret_key: str = "minioadmin"
     s3_bucket: str = "signage-media"
     s3_region: str = "us-east-1"
+    # s3_public_endpoint = ที่อยู่ที่ "เครื่องเล่นข้างนอก" เข้าถึงได้ (LAN IP / โดเมน / CDN)
+    #   เว้นว่าง (default) = ไม่ให้ player ยิงหา MinIO ตรงๆ แต่ให้ดึงไฟล์ผ่าน backend
+    #   ที่ /api/v1/media (ดู core/media_link.py) — เครื่องเล่นคุยกับ backend ได้อยู่แล้วเสมอ
+    #   จึงไม่มีทางเจอปัญหา "แปลชื่อ host ไม่ออก" เหมือนตอน sign ด้วย http://minio:9000
+    #   ตั้งค่านี้เมื่ออยากลดภาระ backend แล้วให้ player โหลดจาก MinIO/CDN ตรงๆ
+    s3_public_endpoint: str = ""
+    # อายุลิงก์สื่อ (วินาที) — player poll manifest ทุก 60s จึงได้ลิงก์ใหม่ก่อนหมดอายุเสมอ
+    media_url_ttl_sec: int = 3600
 
     # ===== JWT =====
     jwt_secret_key: str = "change_me"

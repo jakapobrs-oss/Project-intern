@@ -176,8 +176,16 @@ function buildEmptyZone(key) {
     return d;
 }
 
+// ลิงก์สื่อจาก manifest ปกติเป็น URL เต็ม (backend ประกอบจาก host ที่เราเรียกเข้าไป)
+// แต่ถ้าเป็น path แบบ relative ให้ต่อกับ server URL ที่ pair ไว้ — ห้าม resolve กับ origin
+// ของหน้าเว็บ player เพราะไฟล์อยู่ที่ backend คนละที่กัน
+function mediaUrl(u) {
+    if (!u) return u;
+    try { return new URL(u, state.serverUrl || location.origin).href; } catch { return u; }
+}
+
 function buildZoneContent(zone) {
-    const url = zone.content_url;
+    const url = mediaUrl(zone.content_url);
     const type = zone.content_type;
 
     // Special-case: ticker zone — text scroll แทน iframe
@@ -197,6 +205,9 @@ function buildZoneContent(zone) {
 
     if (type === 'image') {
         const img = document.createElement('img');
+        // crossOrigin ต้องตั้งก่อน src — ให้โหลดแบบ CORS เหมือนกับที่ preCacheMedia ใช้ fetch
+        // ไม่งั้นของใน browser cache จะเป็นคำตอบที่ไม่มี CORS header แล้ว fetch จะโดนบล็อก
+        img.crossOrigin = 'anonymous';
         img.src = url; img.alt = '';
         // fit_mode ผ่าน params_json (cover/contain)
         if (zone.params?.fit_mode === 'cover') img.style.objectFit = 'cover';
@@ -204,6 +215,7 @@ function buildZoneContent(zone) {
     }
     if (type === 'video') {
         const v = document.createElement('video');
+        v.crossOrigin = 'anonymous';   // เหตุผลเดียวกับ img ด้านบน
         v.src = url;
         v.autoplay = true;
         v.muted = (zone.params?.mute !== false);
@@ -292,7 +304,7 @@ async function preCacheMedia(items) {
         for (const it of items || []) {
             for (const z of (it.zones || [])) {
                 if (z.content_url && (z.content_type === 'image' || z.content_type === 'video')) {
-                    urls.add(z.content_url);
+                    urls.add(mediaUrl(z.content_url));
                 }
             }
         }

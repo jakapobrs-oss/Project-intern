@@ -48,3 +48,8 @@ api_router.include_router(reports.router, prefix="/reports", tags=["reports"])
 from app.api.v1.endpoints import led  # noqa: E402
 
 api_router.include_router(led.router, prefix="/led", tags=["led"])
+
+# §22 — ส่งไฟล์สื่อให้เครื่องเล่นผ่าน backend (แทนการให้ยิงหา MinIO ตรงๆ)
+from app.api.v1.endpoints import media  # noqa: E402
+
+api_router.include_router(media.router, tags=["media"])

@@ -16,7 +16,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import selectinload
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.core.storage import presigned_get_url
+from app.core.media_link import build_media_url
 from app.services import schedule_eval
 from app.models.device import Device
 from app.models.schedule import Schedule, ScheduleStatus
@@ -57,16 +57,22 @@ async def _device_schedules(db: AsyncSession, device: Device) -> list[Schedule]:
     return schedule_eval.filter_active(schedules, now=now, device_tz=device_tz)
 
 
-def _content_url(content: Content) -> str | None:
-    """คืน playable URL ของ content — file ใช้ presigned, web/stream ใช้ url ตรงๆ"""
+def _content_url(content: Content, media_base: str = "") -> str | None:
+    """
+    คืน playable URL ของ content — web/stream ใช้ url ตรงๆ, ไฟล์ใช้ลิงก์เซ็นชื่อ
+
+    media_base มาจาก public_media_base(request) = host ที่เครื่องเล่นเรียกถึงได้จริง
+    (อย่ากลับไปใช้ presigned URL ของ MinIO ตรงๆ — sign ด้วยชื่อ service ใน docker
+    แล้วเครื่องเล่นข้างนอกโหลดไม่ได้ ดู core/media_link.py)
+    """
     if content.type in (ContentType.WEB, ContentType.STREAM):
         return content.url
     if content.storage_key:
-        return presigned_get_url(content.storage_key, expires_in=PRESIGNED_TTL)
+        return build_media_url(content.storage_key, media_base=media_base, ttl=PRESIGNED_TTL)
     return None
 
 
-async def _plan_to_items(db: AsyncSession, plan_id: uuid.UUID) -> list[ManifestItem]:
+async def _plan_to_items(db: AsyncSession, plan_id: uuid.UUID, media_base: str = "") -> list[ManifestItem]:
     """expand plan → plan_items → presentations → zones → contents"""
     plan = (await db.execute(
         select(Plan).where(Plan.id == plan_id).options(selectinload(Plan.items))
@@ -111,7 +117,7 @@ async def _plan_to_items(db: AsyncSession, plan_id: uuid.UUID) -> list[ManifestI
                 zone_key=z.zone_key,
                 content_id=c.id,
                 content_type=c.type.value,
-                content_url=_content_url(c),
+                content_url=_content_url(c, media_base),
                 params=z.params_json or {},
             ))
         items.append(ManifestItem(
@@ -178,8 +184,13 @@ def _compute_version(payload: dict) -> str:
     return hashlib.sha256(s.encode()).hexdigest()[:16]
 
 
-async def build_manifest(db: AsyncSession, device: Device) -> Manifest:
-    """สร้าง manifest สำหรับ device นี้"""
+async def build_manifest(db: AsyncSession, device: Device, media_base: str = "") -> Manifest:
+    """
+    สร้าง manifest สำหรับ device นี้
+
+    media_base: URL ฐานของ endpoint สื่อที่เครื่องเล่นเรียกถึงได้ (จาก public_media_base(request))
+    ถ้าไม่ส่ง (เช่นเรียกจาก worker/test) ลิงก์สื่อจะเป็น path แบบ relative
+    """
     schedules = await _device_schedules(db, device)
 
     # ใช้ schedule แรกตาม priority (ที่ active ตอนนี้) — Phase ถัดไปจะ stack หลาย schedule
@@ -187,7 +198,7 @@ async def build_manifest(db: AsyncSession, device: Device) -> Manifest:
     if schedules:
         # pick the highest-priority active schedule
         top = schedules[0]
-        items = await _plan_to_items(db, top.plan_id)
+        items = await _plan_to_items(db, top.plan_id, media_base)
 
     # load plan names สำหรับ schedule list
     plan_ids = [s.plan_id for s in schedules]

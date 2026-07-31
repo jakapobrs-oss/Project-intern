@@ -11,6 +11,7 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, Header, HTTPException, Request, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.core.media_link import public_media_base
 from app.db import get_db
 from app.models.device import Device
 from app.models.audit import AuditOutcome
@@ -111,6 +112,7 @@ async def player_me(device: Device = Depends(get_player)):
 @router.post("/heartbeat", response_model=HeartbeatResponse)
 async def heartbeat(
     payload: HeartbeatRequest,
+    request: Request,
     db: AsyncSession = Depends(get_db),
     device: Device = Depends(get_player),
 ):
@@ -127,7 +129,8 @@ async def heartbeat(
         current_manifest_version=payload.current_manifest_version,
     )
     # build manifest แบบเบาๆ (เอาเฉพาะ version) เทียบกับที่ player ส่งมา
-    manifest = await manifest_service.build_manifest(db, device)
+    # ต้องส่ง media_base เดียวกับตอน GET /manifest ไม่งั้น version ที่เทียบจะคนละก้อน
+    manifest = await manifest_service.build_manifest(db, device, public_media_base(request))
     outdated = (payload.current_manifest_version or "") != manifest.version
 
     from datetime import datetime, timezone
@@ -140,11 +143,13 @@ async def heartbeat(
 
 @router.get("/manifest", response_model=Manifest)
 async def get_manifest(
+    request: Request,
     db: AsyncSession = Depends(get_db),
     device: Device = Depends(get_player),
 ):
     """Manifest pre-computed สำหรับ player นี้ (§35.2)"""
-    manifest = await manifest_service.build_manifest(db, device)
+    # ลิงก์สื่อประกอบจาก host ที่เครื่องเล่นใช้ยิงเข้ามา → เรียกกลับได้แน่นอน
+    manifest = await manifest_service.build_manifest(db, device, public_media_base(request))
     # อัปเดต device.last_manifest_version เพื่อ track
     device.last_manifest_version = manifest.version
     await db.commit()

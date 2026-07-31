@@ -11,7 +11,9 @@
 //   - media: ตอน fetch สำเร็จใหม่ → enforce cache size cap (FIFO ≈ LRU)
 // ============================================================================
 
-const SHELL_CACHE = 'signage-shell-v2';      // bump เมื่อแก้ styles.css/app.js
+// v3 = แก้ app.js (ลิงก์สื่อผ่าน backend + โหลดรูปแบบ CORS) — ไม่ bump แล้วเครื่องเล่นเก่า
+// จะใช้ app.js เดิมใน cache ต่อไปเรื่อยๆ ทั้งที่ deploy ใหม่แล้ว
+const SHELL_CACHE = 'signage-shell-v3';      // bump เมื่อแก้ styles.css/app.js
 const MEDIA_CACHE = 'signage-media-v1';      // sync กับ app.js
 const SHELL = ['./', './index.html', './app.js', './styles.css', './manifest.json'];
 
