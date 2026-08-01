@@ -38,6 +38,12 @@ class UserOut(UserBase):
     """response — ไม่มี password"""
     model_config = ConfigDict(from_attributes=True)
 
+    # ทับ EmailStr ของ UserBase ด้วย str โดยตั้งใจ
+    # ตรวจรูปแบบอีเมลตอน "รับเข้า" (UserCreate/UserUpdate) พอแล้ว — ถ้ามาตรวจซ้ำตอน
+    # "ส่งออก" ข้อมูลที่อยู่ในฐานอยู่แล้วเพียงแถวเดียวผิดรูป จะทำให้ทั้ง endpoint
+    # ตอบ 500 หน้าจัดการผู้ใช้งานเปิดไม่ได้เลย (เจอจริง: seed_demo.py สร้างผู้ใช้
+    # อีเมล @demo.local ซึ่ง email-validator ถือเป็นโดเมนสงวน → ทั้งหน้าพัง)
+    email: str
     id: uuid.UUID
     is_locked: bool
     # ว่าง = ไม่ได้ถูกล็อกชั่วคราว; มีค่า = ระบบล็อกจากการกรอกรหัสผิด จนถึงเวลานี้

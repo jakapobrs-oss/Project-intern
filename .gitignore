@@ -88,3 +88,6 @@ README.TXT
 # มี screenshot ของ test run + login fixtures ที่ฝัง default credential (ChangeMe123!)
 # ไม่ใช่ source code — กันทั้งรหัสหลุดขึ้น repo และกัน run artifacts รก
 user-test-demo/
+
+# สำรองฐานข้อมูล — ห้ามเข้า git (มีข้อมูลจริง + ไฟล์ใหญ่)
+/backups/
