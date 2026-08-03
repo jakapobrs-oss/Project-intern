@@ -95,8 +95,40 @@ curl http://localhost:9001                        # console ขึ้นไห�
 | อาการ | แก้ |
 |---|---|
 | `relation ... does not exist` | ยังไม่ migrate → `alembic upgrade head` |
+| `column users.locked_until does not exist` (หรือคอลัมน์อื่นที่เพิ่งเพิ่ม) | โค้ดใหม่แต่ DB ยังเก่า → ดู §โค้ดใหม่ + DB เก่า ด้านล่าง |
 | backend ขึ้นไม่ได้ตอน start | ดู logs; มัก env ผิด (.env) หรือ DB ยังไม่พร้อม |
 | รัน test ไม่ได้ | `pip install -r requirements.txt` ก่อน แล้ว `pytest -v` |
+
+---
+
+## ⚠️ กับดักตอนพัฒนาบน Docker (เจอจริง เสียเวลาเยอะ)
+
+### แก้โค้ด admin-ui แล้วหน้าเว็บไม่เปลี่ยน
+
+`docker-compose.yml` รัน admin-ui ด้วย `npm run dev` และ mount `./admin-ui:/app` ไว้แล้วก็จริง
+แต่ **Next.js ในคอนเทนเนอร์ไม่ได้รับสัญญาณว่าไฟล์เปลี่ยน** เพราะ inotify ของ Linux ไม่ข้ามมาจาก
+ไฟล์ระบบฝั่ง Windows (และ macOS ก็มีอาการคล้ายกัน) → มันเสิร์ฟหน้าที่คอมไพล์ค้างไว้เดิมตลอด
+
+**อาการหลอก:** แก้โค้ดแล้ว "ไม่มีอะไรเกิดขึ้น" หรือทดสอบแล้วไม่ผ่านทั้งชุด ทั้งที่โค้ดถูกแล้ว
+
+```bash
+docker restart signage_admin_ui     # แล้วรอ ~10-15 วิ ให้ Next คอมไพล์ใหม่
+```
+
+> ฝั่ง backend ไม่มีปัญหานี้ เพราะ uvicorn `--reload` ใช้การ poll ไฟล์แทน inotify
+
+### โค้ดใหม่ + DB เก่า = ทุก request ที่แตะตารางนั้นพัง 500
+
+คอนเทนเนอร์ backend โหลดโค้ดใหม่จากดิสก์เองอัตโนมัติ **แต่ migration ไม่ได้รันตาม**
+พอดึงโค้ดที่มี migration ใหม่มาแล้วยังไม่ migrate จะได้ `column ... does not exist`
+ทุก request ที่แตะตารางนั้น เช่นล็อกอินพังทั้งระบบ
+
+```bash
+docker exec signage_backend alembic upgrade head
+```
+
+**ลำดับที่ถูกต้องตอน deploy คือ migrate ก่อน แล้วค่อยให้โค้ดใหม่รับ traffic** — ดู
+[deployment.md §ลำดับการอัปเดตเวอร์ชัน](deployment.md)
 
 ---
 
