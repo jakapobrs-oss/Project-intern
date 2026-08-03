@@ -3,7 +3,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { Plus, RefreshCw, Key, ExternalLink } from "lucide-react";
+import { Plus, RefreshCw, Key, ExternalLink, Trash2 } from "lucide-react";
 import { api, ApiError } from "@/lib/api";
 import { useAuth, hasRole } from "@/lib/auth";
 import type { Device, DevicePlatform } from "@/lib/types";
@@ -59,7 +59,12 @@ export default function DevicesPage() {
   }, []);
 
   const handleRegenerate = async (device: Device) => {
-    if (!confirm(`รีเซ็ต pairing code ของ "${device.name}"? Token เก่าจะใช้ไม่ได้`)) return;
+    // จอที่จับคู่อยู่แล้วต้องเตือนให้ชัด — ออกรหัสใหม่ = เตะเครื่องเล่นตัวเดิมออกจากระบบทันที
+    const warn =
+      device.status === "unpaired"
+        ? ""
+        : "\nเครื่องเล่นที่จับคู่อยู่ตอนนี้จะหลุดทันที ต้องไปจับคู่ใหม่ที่หน้าจอ";
+    if (!confirm(`ออก pairing code ใหม่ให้ "${device.name}" ?${warn}`)) return;
     try {
       const updated = await api.post<Device>(`/devices/${device.id}/regenerate-pairing`);
       setDevices((prev) => prev?.map((d) => (d.id === device.id ? updated : d)) ?? null);
@@ -67,6 +72,18 @@ export default function DevicesPage() {
       toast.success("รีเซ็ต pairing code สำเร็จ");
     } catch (e) {
       toast.error("รีเซ็ตไม่สำเร็จ", e instanceof ApiError ? e.message : undefined);
+    }
+  };
+
+  // ลบจอออกจากระบบ — ยืนยันก่อนเสมอเพราะ player ที่ผูกอยู่จะหลุดทันที
+  const handleDelete = async (device: Device) => {
+    if (!confirm(`ลบจอ "${device.name}" ?\nถ้าจอนี้ผูก player อยู่ เครื่องเล่นจะดึง content ต่อไม่ได้`)) return;
+    try {
+      await api.delete(`/devices/${device.id}`);
+      setDevices((prev) => prev?.filter((d) => d.id !== device.id) ?? null);
+      toast.success("ลบจอสำเร็จ");
+    } catch (e) {
+      toast.error("ลบไม่สำเร็จ", e instanceof ApiError ? e.message : undefined);
     }
   };
 
@@ -144,14 +161,27 @@ export default function DevicesPage() {
                       <Key className="h-3.5 w-3.5" /> ดู code
                     </Button>
                   )}
-                  {canManage && d.status === "unpaired" && (
+                  {/* ต้องขึ้นทุกสถานะ ไม่ใช่เฉพาะ unpaired — งานจริงที่ต้อง re-pair คือจอที่ paired ไปแล้ว
+                      (เปลี่ยนกล่องเครื่องเล่น / ล้างเครื่อง / ย้ายจอ) ถ้าซ่อนปุ่มไว้จะไม่เหลือทางทำจากหน้าเว็บเลย
+                      และขัดกับข้อความในหน้าต่างรหัสที่บอกให้ "กดรีเซ็ตจากตาราง" — handleRegenerate ถามยืนยันอยู่แล้ว */}
+                  {canManage && (
                     <Button
                       variant="ghost"
                       size="sm"
                       onClick={() => handleRegenerate(d)}
-                      title="สร้าง pairing code ใหม่"
+                      title={d.status === "unpaired" ? "สร้าง pairing code ใหม่" : "จับคู่ใหม่ (ออก pairing code ใหม่)"}
                     >
                       <RefreshCw className="h-3.5 w-3.5" />
+                    </Button>
+                  )}
+                  {canManage && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handleDelete(d)}
+                      title="ลบจอนี้"
+                    >
+                      <Trash2 className="h-3.5 w-3.5 text-rose-600" />
                     </Button>
                   )}
                 </TD>
