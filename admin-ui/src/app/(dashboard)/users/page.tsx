@@ -3,8 +3,9 @@
 // minimal: list + create user + lock/unlock
 
 import { useEffect, useState } from "react";
-import { Plus, Lock, Unlock, RefreshCw } from "lucide-react";
+import { Plus, Lock, Unlock, RefreshCw, Trash2 } from "lucide-react";
 import { api, ApiError } from "@/lib/api";
+import { useAuth } from "@/lib/auth";
 import type { User, Role } from "@/lib/types";
 import { ROLE_LABELS } from "@/lib/types";
 import {
@@ -38,6 +39,7 @@ function isLocked(u: User): boolean {
 
 export default function UsersPage() {
   const toast = useToast();
+  const { user: me } = useAuth(); // ใช้เช็คว่าแถวไหนคือบัญชีตัวเอง — ห้ามลบตัวเอง (backend กันไว้อีกชั้น)
   const [users, setUsers] = useState<User[] | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [createOpen, setCreateOpen] = useState(false);
@@ -67,6 +69,18 @@ export default function UsersPage() {
       toast.success(nextLocked ? `ล็อก ${u.username}` : `ปลดล็อก ${u.username}`);
     } catch (e) {
       toast.error("อัปเดตไม่สำเร็จ", e instanceof ApiError ? e.message : undefined);
+    }
+  };
+
+  // ลบผู้ใช้ถาวร — เตือนให้ชัดว่ากู้ไม่ได้ (ถ้าแค่อยากระงับชั่วคราวให้กด "ล็อก" แทน)
+  const handleDelete = async (u: User) => {
+    if (!confirm(`ลบผู้ใช้ "${u.username}" ถาวร ?\nกู้คืนไม่ได้ — ถ้าต้องการแค่ระงับการเข้าใช้ ให้กด "ล็อก" แทน`)) return;
+    try {
+      await api.delete(`/users/${u.id}`);
+      setUsers((prev) => prev?.filter((x) => x.id !== u.id) ?? null);
+      toast.success(`ลบผู้ใช้ ${u.username} สำเร็จ`);
+    } catch (e) {
+      toast.error("ลบไม่สำเร็จ", e instanceof ApiError ? e.message : undefined);
     }
   };
 
@@ -148,6 +162,12 @@ export default function UsersPage() {
                       <><Lock className="h-3.5 w-3.5" /> ล็อก</>
                     )}
                   </Button>
+                  {/* บัญชีตัวเองไม่ต้องขึ้นปุ่มลบ — กดไปก็โดน backend ปฏิเสธ (400) */}
+                  {u.id !== me?.id && (
+                    <Button size="sm" variant="ghost" onClick={() => handleDelete(u)} title="ลบผู้ใช้นี้">
+                      <Trash2 className="h-3.5 w-3.5 text-rose-600" />
+                    </Button>
+                  )}
                 </TD>
               </tr>
             ))}
