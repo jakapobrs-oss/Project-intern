@@ -66,7 +66,7 @@ async def upload_content_file(
     name: str,
     description: str,
     created_by: uuid.UUID,
-) -> Content:
+) -> tuple[Content, bool]:
     """
     Pipeline:
       1. อ่าน head 64 bytes → detect type
@@ -75,6 +75,11 @@ async def upload_content_file(
       4. validate size
       5. upload ไป S3 key = contents/{hash}/{filename}
       6. INSERT row ใน DB
+
+    คืน (content, deduplicated)
+      deduplicated=True แปลว่าไฟล์ซ้ำกับของเดิมทุกไบต์ จึงคืน "รายการเดิม" กลับไป
+      ไม่ได้สร้างรายการใหม่ และ **ชื่อ/คำอธิบายที่ผู้เรียกส่งมาถูกทิ้ง** — ผู้เรียกต้องเอาธงนี้
+      ไปบอกผู้ใช้ ไม่งั้นผู้ใช้จะไปตามหาสื่อในชื่อที่ตั้งเองแล้วไม่เจอ
     """
     # 1. magic bytes
     head = file.read(64)
@@ -90,7 +95,7 @@ async def upload_content_file(
     res = await db.execute(select(Content).where(Content.sha256 == digest))
     existing = res.scalar_one_or_none()
     if existing:
-        return existing
+        return existing, True
 
     # 4. size limit
     limit = MAX_SIZE.get(ctype)
@@ -130,4 +135,4 @@ async def upload_content_file(
     db.add(content)
     await db.commit()
     await db.refresh(content)
-    return content
+    return content, False

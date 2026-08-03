@@ -2,10 +2,10 @@
 // Contents — list + upload (file) + approve/reject workflow
 
 import { useEffect, useRef, useState } from "react";
-import { Upload, Check, X, RefreshCw } from "lucide-react";
+import { Upload, Check, X, RefreshCw, Trash2 } from "lucide-react";
 import { api, ApiError } from "@/lib/api";
 import { useAuth, hasRole } from "@/lib/auth";
-import type { Content } from "@/lib/types";
+import type { Content, ContentUploadResult } from "@/lib/types";
 import {
   Button,
   Card,
@@ -47,6 +47,18 @@ export default function ContentsPage() {
   useEffect(() => {
     load();
   }, []);
+
+  // ลบสื่อ — เตือนว่าถ้าสื่อชิ้นนี้ถูกใช้ในผังอยู่ จอที่กำลังเล่นจะไม่มีของชิ้นนี้ให้เล่นต่อ
+  const handleDelete = async (c: Content) => {
+    if (!confirm(`ลบสื่อ "${c.name}" ?\nถ้าสื่อชิ้นนี้ถูกใช้ในชุดนำเสนอ/ผังอยู่ จอจะเล่นชิ้นนี้ไม่ได้อีก`)) return;
+    try {
+      await api.delete(`/contents/${c.id}`);
+      setItems((prev) => prev?.filter((x) => x.id !== c.id) ?? null);
+      toast.success("ลบสื่อสำเร็จ");
+    } catch (e) {
+      toast.error("ลบไม่สำเร็จ", e instanceof ApiError ? e.message : undefined);
+    }
+  };
 
   const handleSubmitForApproval = async (c: Content) => {
     try {
@@ -146,6 +158,11 @@ export default function ContentsPage() {
                       </Button>
                     </>
                   )}
+                  {canUpload && (
+                    <Button size="sm" variant="ghost" onClick={() => handleDelete(c)} title="ลบสื่อนี้">
+                      <Trash2 className="h-3.5 w-3.5 text-rose-600" />
+                    </Button>
+                  )}
                 </TD>
               </tr>
             ))}
@@ -157,7 +174,22 @@ export default function ContentsPage() {
         open={uploadOpen}
         onClose={() => setUploadOpen(false)}
         onUploaded={(c) => {
-          setItems((prev) => (prev ? [c, ...prev] : [c]));
+          // ไฟล์ซ้ำของเดิม (ระบบตัดไฟล์ซ้ำด้วยลายนิ้วมือไฟล์) → ที่ได้กลับมาคือ "รายการเดิม"
+          // ห้ามต่อเป็นแถวใหม่ (จะได้แถวซ้ำ id เดียวกัน) และต้องบอกผู้ใช้ว่าชื่อที่ตั้งไม่ถูกใช้
+          if (c.deduplicated) {
+            toast.warn(
+              "ไฟล์นี้มีอยู่แล้วในระบบ",
+              `ระบบใช้สื่อเดิมชื่อ "${c.name}" แทน — ชื่อที่เพิ่งตั้งไม่ถูกนำไปใช้ ถ้าต้องการเปลี่ยนชื่อให้แก้ที่สื่อเดิม`,
+            );
+          } else {
+            toast.success(`อัปโหลด "${c.name}" สำเร็จ`);
+          }
+          setItems((prev) => {
+            if (!prev) return [c];
+            return prev.some((x) => x.id === c.id)
+              ? prev.map((x) => (x.id === c.id ? c : x))
+              : [c, ...prev];
+          });
         }}
       />
 
@@ -180,7 +212,7 @@ function UploadModal({
 }: {
   open: boolean;
   onClose: () => void;
-  onUploaded: (c: Content) => void;
+  onUploaded: (c: ContentUploadResult) => void;
 }) {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
@@ -208,7 +240,7 @@ function UploadModal({
     form.set("file", file);
     setLoading(true);
     try {
-      const c = await api.upload<Content>("/contents/upload", form);
+      const c = await api.upload<ContentUploadResult>("/contents/upload", form);
       onUploaded(c);
       reset();
       onClose();

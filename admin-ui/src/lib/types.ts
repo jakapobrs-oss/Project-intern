@@ -106,6 +106,14 @@ export interface Content {
   updated_at: string;
 }
 
+/**
+ * ผลของการอัปโหลดไฟล์ — deduplicated=true แปลว่าไฟล์ซ้ำกับสื่อที่มีอยู่แล้ว
+ * ระบบคืน "รายการเดิม" มาให้ ไม่ได้สร้างใหม่ และชื่อที่ผู้ใช้เพิ่งตั้งไม่ถูกใช้
+ */
+export interface ContentUploadResult extends Content {
+  deduplicated: boolean;
+}
+
 // ===== Presentation =====
 export interface PresentationZone {
   id: string;

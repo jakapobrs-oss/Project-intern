@@ -52,6 +52,16 @@ class ContentOut(ContentBase):
     updated_at: datetime
 
 
+class ContentUploadOut(ContentOut):
+    """
+    ผลของการอัปโหลดไฟล์ — เหมือน ContentOut แต่มีธงบอกว่าไฟล์ซ้ำของเดิมหรือเปล่า
+
+    deduplicated=True แปลว่าระบบเจอไฟล์เนื้อเดียวกัน (SHA-256 ตรงกัน) อยู่แล้ว จึงคืน
+    รายการเดิมกลับไปแทนการสร้างใหม่ — หน้าจอต้องบอกผู้ใช้ว่าชื่อที่เพิ่งตั้งไม่ถูกใช้
+    """
+    deduplicated: bool = False
+
+
 class ApprovalAction(BaseModel):
     """approve/reject content"""
     approve: bool = True

@@ -12,7 +12,9 @@ from app.core import queue, url_guard
 from app.db import get_db
 from app.models.content import Content, ApprovalStatus, ContentType
 from app.models.user import User, Role
-from app.schemas.content import ContentOut, ContentUpdate, ContentCreateUrl, ApprovalAction
+from app.schemas.content import (
+    ContentOut, ContentUploadOut, ContentUpdate, ContentCreateUrl, ApprovalAction,
+)
 from app.services import audit_service, content_service
 from app.services.content_service import ContentServiceError
 
@@ -34,7 +36,7 @@ async def list_contents(
     return res.scalars().all()
 
 
-@router.post("/upload", response_model=ContentOut, status_code=201)
+@router.post("/upload", response_model=ContentUploadOut, status_code=201)
 async def upload_content(
     request: Request,
     name: str = Form(...),
@@ -45,7 +47,7 @@ async def upload_content(
 ):
     """อัปโหลดไฟล์ media — auto detect type จาก magic bytes + SHA-256 dedupe"""
     try:
-        content = await content_service.upload_content_file(
+        content, deduplicated = await content_service.upload_content_file(
             db,
             file=file.file,
             filename=file.filename or "unnamed",
@@ -65,9 +67,18 @@ async def upload_content(
     await audit_service.log_action(
         db, request, user, "content.upload",
         target_type="content", target_id=content.id,
-        message=f"อัปโหลดสื่อ {content.name} ชนิด {content.type.value}",
+        # แยกข้อความให้ชัด — ถ้าเป็นไฟล์ซ้ำ ผู้ตรวจสอบต้องรู้ว่าไม่มีสื่อใหม่เกิดขึ้น
+        # และรู้ว่าชื่อที่ผู้ใช้พยายามตั้งคืออะไร (ไม่ถูกใช้จริง)
+        message=(
+            f"อัปโหลดไฟล์ซ้ำกับสื่อเดิม {content.name} — ระบบใช้รายการเดิม "
+            f"(ชื่อที่ผู้ใช้ตั้ง: {name})"
+            if deduplicated
+            else f"อัปโหลดสื่อ {content.name} ชนิด {content.type.value}"
+        ),
     )
-    return content
+    out = ContentUploadOut.model_validate(content)
+    out.deduplicated = deduplicated
+    return out
 
 
 @router.post("/url", response_model=ContentOut, status_code=201)
