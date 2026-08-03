@@ -2,7 +2,7 @@
 // Schedules — list + create wizard (Plan + Group + datetime + RRULE) + approve + pause
 
 import { useEffect, useState } from "react";
-import { Check, Pause, RefreshCw, Plus } from "lucide-react";
+import { Check, Pause, RefreshCw, Plus, Trash2 } from "lucide-react";
 import { api, ApiError } from "@/lib/api";
 import { useAuth, hasRole } from "@/lib/auth";
 import type { Schedule, Plan, PlayerGroup } from "@/lib/types";
@@ -55,6 +55,20 @@ export default function SchedulesPage() {
       toast.success(`Paused: ${s.name}`);
     } catch (e) {
       toast.error("pause ไม่สำเร็จ", e instanceof ApiError ? e.message : undefined);
+    }
+  };
+
+  // ลบตารางเล่นถาวร — ถ้าตารางกำลัง active อยู่ จอที่ผูกไว้จะเลิกเล่นผังนี้ทันทีในรอบดึงข้อมูลถัดไป
+  // (ถ้าแค่อยากหยุดชั่วคราวให้กด Pause ซึ่งเก็บตารางไว้แก้ต่อได้)
+  const handleDelete = async (s: Schedule) => {
+    const extra = s.status === "active" ? "\nตารางนี้กำลังใช้งานอยู่ จอที่ผูกไว้จะหยุดเล่นผังนี้" : "";
+    if (!confirm(`ลบตารางเล่น "${s.name}" ถาวร ?${extra}\nถ้าต้องการแค่หยุดชั่วคราว ให้กด Pause แทน`)) return;
+    try {
+      await api.delete(`/schedules/${s.id}`);
+      setItems((prev) => prev?.filter((x) => x.id !== s.id) ?? null);
+      toast.success(`ลบตารางเล่น "${s.name}" สำเร็จ`);
+    } catch (e) {
+      toast.error("ลบไม่สำเร็จ", e instanceof ApiError ? e.message : undefined);
     }
   };
 
@@ -131,6 +145,16 @@ export default function SchedulesPage() {
                   {canEdit && s.status === "active" && (
                     <Button size="sm" variant="ghost" onClick={() => handlePause(s)}>
                       <Pause className="h-3.5 w-3.5" /> Pause
+                    </Button>
+                  )}
+                  {canEdit && (
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={() => handleDelete(s)}
+                      title="ลบตารางเล่นนี้"
+                    >
+                      <Trash2 className="h-3.5 w-3.5 text-rose-600" />
                     </Button>
                   )}
                 </TD>
